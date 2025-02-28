@@ -1,0 +1,7 @@
+[project]
+name = "mads-dav-mel"
+version = "0.1.0"
+description = "Master of informatics ADS"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
