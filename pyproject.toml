@@ -3,5 +3,23 @@ name = "mads-dav-mel"
 version = "0.1.0"
 description = "Master of informatics ADS"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "click>=8.1.8",
+    "loguru>=0.7.3",
+    "numpy>=2.2.1",
+    "pandas>=2.2.3",
+    "plotly>=5.24.1",
+    "pyarrow>=18.1.0",
+    "pydantic>=2.10.4",
+    "scikit-learn>=1.6.0",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.4",
+]
+
+[project.scripts]
+"analyzer" = "wa_analyzer.preprocess:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["wa_analyzer"]
