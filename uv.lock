@@ -138,6 +138,7 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "statsmodels" },
+    { name = "wa-analyzer" },
 ]
 
 [package.metadata]
@@ -152,6 +153,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.6.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "statsmodels", specifier = ">=0.14.4" },
+    { name = "wa-analyzer", path = "wa_analyzer-0.4.1-py3-none-any.whl" },
 ]
 
 [[package]]
@@ -472,6 +474,44 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/0f/fa4723f22942480be4ca9527bbde8d43f6c3f2fe8412f00e7f5f6746bc8b/tzdata-2025.1.tar.gz", hash = "sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694", size = 194950 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/dd/84f10e23edd882c6f968c21c2434fe67bd4a528967067515feca9e611e5e/tzdata-2025.1-py2.py3-none-any.whl", hash = "sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639", size = 346762 },
+]
+
+[[package]]
+name = "wa-analyzer"
+version = "0.4.1"
+source = { path = "wa_analyzer-0.4.1-py3-none-any.whl" }
+dependencies = [
+    { name = "click" },
+    { name = "loguru" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "pydantic" },
+    { name = "scikit-learn" },
+    { name = "seaborn" },
+    { name = "statsmodels" },
+]
+wheels = [
+    { filename = "wa_analyzer-0.4.1-py3-none-any.whl", hash = "sha256:2864eb248f9a724cf55235df6d65cf6c25143f027b2be41eabaee58fd37ab4f2" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "click", specifier = ">=8.1.7" },
+    { name = "loguru", specifier = ">=0.7.2" },
+    { name = "mads-datasets", marker = "extra == 'plotting'", specifier = ">=0.3.14" },
+    { name = "numpy", specifier = ">=1.26.3" },
+    { name = "pandas", specifier = ">=2.2.0" },
+    { name = "plotly", marker = "extra == 'plotting'", specifier = ">=5.18.0" },
+    { name = "pyarrow", specifier = ">=15.0.0" },
+    { name = "pydantic", specifier = ">=2.5.3" },
+    { name = "scikit-learn", specifier = ">=1.4.0" },
+    { name = "seaborn", specifier = ">=0.13.1" },
+    { name = "sentence-transformers", marker = "extra == 'huggingface'", specifier = ">=2.5.1" },
+    { name = "statsmodels", specifier = ">=0.14.1" },
+    { name = "streamlit", marker = "extra == 'plotting'", specifier = ">=1.31.1" },
+    { name = "torch", marker = "extra == 'huggingface'", specifier = ">=2.2.1" },
+    { name = "transformers", marker = "extra == 'huggingface'", specifier = ">=4.38.2" },
 ]
 
 [[package]]

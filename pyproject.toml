@@ -15,11 +15,8 @@ dependencies = [
     "scikit-learn>=1.6.0",
     "seaborn>=0.13.2",
     "statsmodels>=0.14.4",
+    "wa-analyzer",
 ]
 
-[project.scripts]
-"analyzer" = "wa_analyzer.preprocess:main"
-
-[tool.setuptools]
-package-dir = {"" = "src"}
-packages = ["wa_analyzer"]
+[tool.uv.sources]
+wa-analyzer = { path = "wa_analyzer-0.4.1-py3-none-any.whl" }
