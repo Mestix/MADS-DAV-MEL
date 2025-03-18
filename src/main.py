@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "function",
         choices=["generate_les2"],
-        help="Specificeer welke functie je wilt uitvoeren",
+        help="Genereer de comparing catagories bar chart van les 2",
     )
 
     args = parser.parse_args()
