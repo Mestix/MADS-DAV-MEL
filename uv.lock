@@ -153,7 +153,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.6.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "statsmodels", specifier = ">=0.14.4" },
-    { name = "wa-analyzer", path = "wa_analyzer-0.4.1-py3-none-any.whl" },
+    { name = "wa-analyzer", path = "libs/wa_analyzer-0.4.1-py3-none-any.whl" },
 ]
 
 [[package]]
@@ -479,7 +479,7 @@ wheels = [
 [[package]]
 name = "wa-analyzer"
 version = "0.4.1"
-source = { path = "wa_analyzer-0.4.1-py3-none-any.whl" }
+source = { path = "libs/wa_analyzer-0.4.1-py3-none-any.whl" }
 dependencies = [
     { name = "click" },
     { name = "loguru" },
