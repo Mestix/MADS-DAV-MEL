@@ -25,7 +25,7 @@ def load_data(config: Config) -> pd.DataFrame:
     
     if not datafile.exists():
         logger.warning(
-            f"{datafile} does not exist. First run src/preprocess.py, and check the timestamp!"
+            f"{datafile} does not exist. First run analyzer --device ios"
         )
         return pd.DataFrame()
     
@@ -51,18 +51,5 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path)
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
-    # plt.show()
+    print("Grafiek gemaakt")
 
-if __name__ == "__main__":
-    # Laad de configuratie
-    config_path = Path("./config.toml").resolve()
-    config = Config.load(config_path)
-
-    # Laad de data
-    df = load_data(config)
-
-    # Geef het pad op waar de afbeelding moet worden opgeslagen
-    output_path = Path("./img/aantal_gestelde_vragen_per_gebruiker.jpg")
-
-    # Genereer de grafiek
-    generate_question_bar_chart(df, output_path)
