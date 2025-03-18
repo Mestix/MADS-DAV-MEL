@@ -40,16 +40,44 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     vraag_count = df.groupby("author")["questions"].sum().reset_index()
     vraag_count = vraag_count.sort_values(by="questions", ascending=False)
     vraag_count = vraag_count[vraag_count["questions"] > 0]
-    
+
+    # "laughing-cat" wordt rood, "decorated-shark" wordt blauw
+    colors = [
+        "red" if author == "laughing-cat" else 
+        "blue" if author == "decorated-shark" else 
+        "grey" 
+        for author in vraag_count["author"]
+    ]
+
     plt.figure(figsize=(10, 5))
-    plt.barh(vraag_count["author"], vraag_count["questions"], color='grey')
+    bars = plt.barh(vraag_count["author"], vraag_count["questions"], color=colors)
     plt.xlabel("Aantal Vragen")
     plt.ylabel("Gebruiker")
-    plt.title("Meest nieuwsgierige groepsleden")
-    plt.gca().invert_yaxis()
-    
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path)
+    plt.title("Deze groepsleden stellen de meeste vragen")
+
+    plt.gca().invert_yaxis()  # Hoogste waarde bovenaan
+
+    # y-positie van "decorated-shark"  (door chatGPT)
+    if "decorated-shark" in vraag_count["author"].values:
+        y_pos = list(vraag_count["author"]).index("decorated-shark")
+        x_value = vraag_count["questions"].iloc[y_pos]  # Aantal vragen van decorated-shark 
+
+        plt.xlim(right=x_value + 10)
+        plt.annotate(
+            "Mijn schoonmoeder:\n\"Wie komt er eten?\" =P",
+            xy=(x_value, y_pos),  # Pijl naar de bar
+            xytext=(x_value + 8, y_pos),  # Tekst nog verder naar rechts
+            arrowprops=dict(facecolor='blue', arrowstyle="->"),
+            fontsize=12,
+            color="blue",
+            bbox=dict(boxstyle="round,pad=0.3", edgecolor="blue", facecolor="white")
+        )
+
+    # Extra marges om te zorgen dat de tekst niet buiten de afbeelding valt
+    plt.subplots_adjust(right=0.75)  
+    plt.savefig(output_path, bbox_inches="tight")  # Zorgt dat alles in beeld blijft
+
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
+    
     print("Grafiek gemaakt")
 
