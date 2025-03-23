@@ -1,8 +1,9 @@
 import argparse
 from pathlib import Path
-from my_module.les2 import generate_question_bar_chart
-from my_module.les5 import generate_relations_chart
-from my_module.config import Config, load_data
+from dataloader import Config, load_data
+from les2 import generate_question_bar_chart
+from les5 import generate_relations_chart
+from preprocessor import preprocess_data
 
 def run_chart_for_lesson(lesson_number: int):
     config_path = Path("./config.toml").resolve()
@@ -19,12 +20,17 @@ def run_chart_for_lesson(lesson_number: int):
         return
 
     output_path_str, chart_func = output_map[lesson_number]
-    output_path = Path(output_path_str)
-    chart_func(df, output_path)
+    chart_func(df, Path(output_path_str))
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Draai visualisatie-opdrachten per les")
-    parser.add_argument("--les", type=int, required=True, help="Lesnummer (bijv. 2 of 5)")
+    parser = argparse.ArgumentParser(description="Draai preprocessing of lesvisualisaties")
+    parser.add_argument("--preprocess", action="store_true", help="Voer preprocessing uit")
+    parser.add_argument("--les", type=int, help="Genereer visualisatie voor specifieke les (bijv. 2 of 5)")
     args = parser.parse_args()
 
-    run_chart_for_lesson(args.les)
+    if args.preprocess:
+        preprocess_data(Path("./config.toml"))
+    elif args.les:
+        run_chart_for_lesson(args.les)
+    else:
+        print("Gebruik --preprocess of --les [nummer] om iets uit te voeren.")
