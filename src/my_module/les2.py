@@ -3,34 +3,9 @@ import pandas as pd
 from pathlib import Path
 from loguru import logger
 import warnings
-import tomllib
-from pydantic import BaseModel
 import matplotlib.patches as mpatches
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
-
-class Config(BaseModel):
-    processed: str
-    current: str
-
-    @classmethod
-    def load(cls, path: Path):
-        with path.open("rb") as f:
-            config_data = tomllib.load(f)
-        return cls(**config_data)
-
-def load_data(config: Config) -> pd.DataFrame:
-    root = Path(".").resolve()
-    processed = root / Path(config.processed)
-    datafile = processed / config.current
-    
-    if not datafile.exists():
-        logger.warning(
-            f"{datafile} does not exist. First run analyzer --device ios"
-        )
-        return pd.DataFrame()
-    
-    return pd.read_parquet(datafile)
 
 def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     if df.empty:
@@ -86,6 +61,6 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     plt.legend(handles=legend_handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
 
     plt.savefig(output_path, bbox_inches="tight")  # Zorgt dat alles in beeld blijft
-
+    plt.close()
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
 
