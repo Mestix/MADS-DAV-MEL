@@ -1,9 +1,10 @@
 import argparse
 from pathlib import Path
-from dataloader import Config, load_data
+from dataloader import load_data
 from les2 import generate_question_bar_chart
 from les5 import generate_relations_chart
-from preprocessor import preprocess_data
+from preprocessor import Preprocessor
+from config import Config
 
 def run_chart_for_lesson(lesson_number: int):
     config_path = Path("./config.toml").resolve()
@@ -29,7 +30,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.preprocess:
-        preprocess_data(Path("./config.toml"))
+        pre = Preprocessor(Path("./config.toml"))
+        pre.run()
     elif args.les:
         run_chart_for_lesson(args.les)
     else:

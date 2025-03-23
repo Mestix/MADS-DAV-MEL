@@ -1,18 +1,7 @@
-import tomllib
-from pydantic import BaseModel
 from pathlib import Path
 from loguru import logger
 import pandas as pd
-
-class Config(BaseModel):
-    processed: str
-    current: str
-
-    @classmethod
-    def load(cls, path: Path):
-        with path.open("rb") as f:
-            config_data = tomllib.load(f)
-        return cls(**config_data)
+from config import Config
 
 def load_data(config: Config) -> pd.DataFrame:
     root = Path(".").resolve()

@@ -2,58 +2,83 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-
 import pandas as pd
+import tomllib
 from loguru import logger
 from wa_analyzer.humanhasher import humanize
-import tomllib
 
-def preprocess_data(config_path: Path) -> None:
-    # Load config and paths
-    with config_path.open("rb") as f:
-        config = tomllib.load(f)
+class Preprocessor:
+    def __init__(self, config_path: Path):
+        with config_path.open("rb") as f:
+            config = tomllib.load(f)
 
-    processed = Path(config["processed"])
-    inputfile = processed / config["inputpath"]
+        self.processed = Path(config["processed"])
+        self.inputfile = self.processed / config["inputpath"]
+        self.authorinfo = self.processed / config["author_info"]
+        self.df = pd.DataFrame()
 
-    if not inputfile.exists():
-        logger.warning(f"{inputfile} does not exist. Maybe first run wa-analyzer")
-        return
+    def load_data(self):
+        if not self.inputfile.exists():
+            logger.warning(f"{self.inputfile} bestaat niet. Eerst wa-analyzer draaien?")
+            return False
 
-    # Read data
-    df = pd.read_csv(inputfile, parse_dates=["timestamp"])
-    logger.info(f"Data geladen met {len(df)} rijen.")
+        self.df = pd.read_csv(self.inputfile, parse_dates=["timestamp"])
+        logger.info(f"Data geladen met {len(self.df)} rijen.")
+        return True
 
-    # Clean ~ + unicode from author
-    clean_tilde = r"^~\u202f"
-    df["author"] = df["author"].apply(lambda x: re.sub(clean_tilde, "", x))
+    def clean_authors(self):
+        clean_tilde = r"^~\u202f"
+        self.df["author"] = self.df["author"].apply(lambda x: re.sub(clean_tilde, "", x))
 
-    # Anonymiseer authors
-    authors = df["author"].unique()
-    anon_map = {k: humanize(k) for k in authors}
-    assert len(anon_map) == len(authors), "Aantal authors klopt niet, check anonimisering"
+    def anonymize_authors(self):
+        authors = self.df["author"].unique()
+        anon_map = {k: humanize(k) for k in authors}
+        assert len(anon_map) == len(authors), "Aantal authors klopt niet"
 
-    # Sla referentie op
-    reference_file = processed / "anon_reference.json"
-    ref_sorted = {v: k for k, v in sorted((v, k) for k, v in anon_map.items())}
-    with open(reference_file, "w") as f:
-        json.dump(ref_sorted, f)
+        # Referentie opslaan
+        reference_file = self.processed / "anon_reference.json"
+        ref_sorted = {v: k for k, v in sorted((v, k) for k, v in anon_map.items())}
+        with open(reference_file, "w") as f:
+            json.dump(ref_sorted, f)
 
-    # Drop originele author, voeg anonieme toe
-    df["anon_author"] = df["author"].map(anon_map)
-    df.drop(columns=["author"], inplace=True)
-    df.rename(columns={"anon_author": "author"}, inplace=True)
+        self.df["anon_author"] = self.df["author"].map(anon_map)
+        self.df.drop(columns=["author"], inplace=True)
+        self.df.rename(columns={"anon_author": "author"}, inplace=True)
 
-    # Verwijder eerste rij (versleuteld)
-    df = df.drop(index=[0])
+    def remove_intro_line(self):
+        self.df = self.df.drop(index=[0])
 
-    # Save als csv en parquet met timestamp
-    now = datetime.now().strftime("%Y%m%d-%H%M%S")
-    output_csv = processed / f"whatsapp-{now}.csv"
-    output_parquet = output_csv.with_suffix(".parquet")
+    def add_author_info(self):
+        if not self.authorinfo.exists():
+            logger.error(f"Bestand met auteur-info niet gevonden: {self.authorinfo}")
+            return
 
-    df.to_csv(output_csv, index=False)
-    df.to_parquet(output_parquet, index=False)
+        info_df = pd.read_csv(self.authorinfo)
+        expected_cols = {"author", "age", "gender"}
+        if not expected_cols.issubset(info_df.columns):
+            logger.error(f"Verwachte kolommen ontbreken in {self.authorinfo}")
+            return
 
-    logger.success(f"Data opgeslagen als:\n- {output_csv}\n- {output_parquet}")
-    logger.info("Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!")
+        self.df = self.df.merge(info_df, on="author", how="left")
+        logger.info(f"Leeftijd en geslacht toegevoegd voor {self.df['author'].nunique()} auteurs.")
+
+    def save_output(self):
+        now = datetime.now().strftime("%Y%m%d-%H%M%S")
+        output_csv = self.processed / f"whatsapp-{now}.csv"
+        output_parquet = output_csv.with_suffix(".parquet")
+
+        self.df.to_csv(output_csv, index=False)
+        self.df.to_parquet(output_parquet, index=False)
+
+        logger.success(f"Data opgeslagen als:\n- {output_csv}\n- {output_parquet}")
+        logger.info("Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!")
+
+    def run(self):
+        if not self.load_data():
+            return
+
+        self.clean_authors()
+        self.anonymize_authors()
+        self.remove_intro_line()
+        self.add_author_info()
+        self.save_output()
