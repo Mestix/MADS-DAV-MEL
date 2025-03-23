@@ -51,7 +51,7 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     ]
 
     plt.figure(figsize=(10, 5))
-    bars = plt.barh(vraag_count["author"], vraag_count["questions"], color=colors)
+    plt.barh(vraag_count["author"], vraag_count["questions"], color=colors)
     plt.xlabel("Aantal Vragen")
     plt.ylabel("Gebruiker")
     plt.title("Deze groepsleden stellen de meeste vragen")
@@ -88,6 +88,4 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     plt.savefig(output_path, bbox_inches="tight")  # Zorgt dat alles in beeld blijft
 
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
-    
-    print("Grafiek gemaakt")
 
