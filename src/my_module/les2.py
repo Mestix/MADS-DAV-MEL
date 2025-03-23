@@ -5,6 +5,7 @@ from loguru import logger
 import warnings
 import tomllib
 from pydantic import BaseModel
+import matplotlib.patches as mpatches
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -75,6 +76,15 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
 
     # Extra marges om te zorgen dat de tekst niet buiten de afbeelding valt
     plt.subplots_adjust(right=0.75)  
+
+    legend_handles = [
+    mpatches.Patch(color='red', label='Ik'),
+    mpatches.Patch(color='blue', label='Mijn Schoonmoeder'),
+    mpatches.Patch(color='grey', label='Overige groepsleden')
+    ]
+
+    plt.legend(handles=legend_handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
+
     plt.savefig(output_path, bbox_inches="tight")  # Zorgt dat alles in beeld blijft
 
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
