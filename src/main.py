@@ -5,6 +5,7 @@ from les2 import generate_question_bar_chart
 from les5 import generate_relations_chart
 from preprocessor import Preprocessor
 from config import Config
+from les3 import generate_time_charts
 
 def run_chart_for_lesson(lesson_number: int):
     config_path = Path("./config.toml").resolve()
@@ -13,6 +14,7 @@ def run_chart_for_lesson(lesson_number: int):
 
     output_map = {
         2: ("./img/aantal_gestelde_vragen_per_gebruiker.jpg", generate_question_bar_chart),
+        3: ("./img", generate_time_charts),
         5: ("./img/carnaval_vs_gender_boxplot.png", generate_relations_chart),
     }
 
