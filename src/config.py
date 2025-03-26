@@ -7,7 +7,8 @@ class Config(BaseModel):
     processed: str
     current: str
     author_info: str | None = None
-    config_path: Path | None = None  
+    config_path: Path | None = None 
+    img_folder: str | None = None
 
     @classmethod
     def load(cls, path: Path):

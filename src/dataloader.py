@@ -3,7 +3,7 @@ from loguru import logger
 import pandas as pd
 from config import Config
 
-def load_data(config: Config) -> pd.DataFrame:
+def load_data_parquet(config: Config) -> pd.DataFrame:
     # Vind de projectroot: map waarin 'config.toml' staat
     root = config.config_path or Path(".").resolve()
     
@@ -11,7 +11,7 @@ def load_data(config: Config) -> pd.DataFrame:
     datafile = processed / config.current
 
     if not datafile.exists():
-        logger.warning(f"{datafile} does not exist. First run preprocessing.")
+        logger.warning(f"{datafile} does not exist. First run --preprocess")
         return pd.DataFrame()
 
     return pd.read_parquet(datafile)

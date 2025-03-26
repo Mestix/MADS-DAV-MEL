@@ -3,31 +3,41 @@ import re
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
-import tomllib
 from loguru import logger
 from wa_analyzer.humanhasher import humanize
+from config import Config
 
 class Preprocessor:
-    def __init__(self, config_path: Path):
-        with config_path.open("rb") as f:
-            config = tomllib.load(f)
-
-        self.processed = Path(config["processed"])
-        self.inputfile = self.processed / config["inputpath"]
-        self.authorinfo = self.processed / config["author_info"]
+    def __init__(self, config: Config):
+        self.config = config
+        self.processed = Path(config.processed)
+        self.inputfile = self.processed / config.current
+        self.authorinfo = self.processed / config.author_info
         self.df = pd.DataFrame()
 
-    def load_data(self):
+    def load_data_csv(self):
         if not self.inputfile.exists():
-            logger.warning(f"{self.inputfile} bestaat niet. Eerst wa-analyzer draaien?")
+            logger.warning(f"{self.inputfile} bestaat niet.")
             return False
 
-        self.df = pd.read_csv(self.inputfile, parse_dates=["timestamp"])
+        try:
+            if self.inputfile.suffix == ".parquet":
+                self.df = pd.read_parquet(self.inputfile)
+            else:
+                self.df = pd.read_csv(self.inputfile, parse_dates=["timestamp"])
+        except Exception as e:
+            logger.error(f"Fout bij inlezen van {self.inputfile}: {e}")
+            return False
+
         logger.info(f"Data geladen met {len(self.df)} rijen.")
         return True
 
     def clean_authors(self):
         clean_tilde = r"^~\u202f"
+        if "author" not in self.df.columns:
+            logger.error("Kolom 'author' ontbreekt in de data.")
+            return False
+    
         self.df["author"] = self.df["author"].apply(lambda x: re.sub(clean_tilde, "", x))
 
     def anonymize_authors(self):
@@ -44,6 +54,7 @@ class Preprocessor:
         self.df["anon_author"] = self.df["author"].map(anon_map)
         self.df.drop(columns=["author"], inplace=True)
         self.df.rename(columns={"anon_author": "author"}, inplace=True)
+        logger.info(f"{len(authors)} auteurs geanonimiseerd.")
 
     def remove_intro_line(self):
         self.df = self.df.drop(index=[0])
@@ -74,7 +85,7 @@ class Preprocessor:
         logger.info("Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!")
 
     def run(self):
-        if not self.load_data():
+        if not self.load_data_csv():
             return
 
         self.clean_authors()
