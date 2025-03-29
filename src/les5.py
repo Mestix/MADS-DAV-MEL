@@ -14,9 +14,9 @@ def generate_relations_chart(df: pd.DataFrame, output_path: Path):
 
     # Groepeert per persoon en bereken carnaval-ratio
     person_df = df.groupby('author').agg({
-        'is_carnaval': 'mean',
-        'is_inlaw': 'first'
-    }).reset_index()
+        'is_inlaw': 'first',
+        'timestamp': 'count'
+    }).rename(columns={'timestamp': 'message_count'}).reset_index()
 
     # Filtert op bekende gender en lowercase
     person_df = person_df[person_df['is_inlaw'].notna()]
@@ -27,12 +27,12 @@ def generate_relations_chart(df: pd.DataFrame, output_path: Path):
     sns.boxplot(
         data=person_df,
         x='is_inlaw_label',
-        y='is_carnaval',
+        y='message_count',
         palette={"Nee": "skyblue", "Ja": "lightcoral"}
     )
     plt.xlabel('Is aangetrouwd?')
-    plt.ylabel('Aandeel berichten tijdens carnaval')
-    plt.title('Carnavalactiviteit aangetrouwd ja of nee')
+    plt.ylabel('Aantal gestuurde berichten')
+    plt.title('Chat activiteit aangetrouwd ja of nee')
     plt.tight_layout()
 
     plt.savefig(output_path, bbox_inches="tight")
@@ -76,4 +76,4 @@ def generate_relation_charts(df: pd.DataFrame, output_dir: Path):
         return
 
     generate_corelation_diagram(df, output_dir / "les5_correlaties.png")
-    generate_relations_chart(df, output_dir / "les5_carnaval_vs_aangetrouwd")
+    generate_relations_chart(df, output_dir / "les5_activiteit_vs_aangetrouwd")
