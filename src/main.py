@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from les2 import generate_question_bar_chart
+from les4 import generate_distribution_charts
 from les5 import generate_relation_charts
 from preprocessor import Preprocessor
 from config import Config
@@ -10,6 +11,7 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
     output_map = {
         2: (img_folder, generate_question_bar_chart),
         3: (img_folder, generate_time_charts),
+        4: (img_folder, generate_distribution_charts),
         5: (img_folder, generate_relation_charts),
     }
 
@@ -23,6 +25,7 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
 def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(2, df, output_folder)
     run_chart_for_lesson(3, df, output_folder)
+    run_chart_for_lesson(4, df, output_folder)
     run_chart_for_lesson(5, df, output_folder)
 
 if __name__ == "__main__":
