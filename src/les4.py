@@ -20,33 +20,39 @@ def generate_message_length_distribution(df: pd.DataFrame, output_path: Path):
     message_lengths = df['message_length']
     positive_lengths = message_lengths[message_lengths > 0]
 
-    # Maak bins: 0–200 in stappen van 1 + alles daarboven in 1 bin
-    bins = list(range(0, 200, 1)) + [positive_lengths.max()]
+    # Maak bins: 0–200 in stappen van 3 + alles daarboven in 1 bin
+    bins = list(range(0, 200, 3)) + [positive_lengths.max()]
 
-    # Fit een lognormale verdeling
+    # Lognormale fit
     shape, loc, scale = lognorm.fit(positive_lengths, floc=0)
-    x = np.linspace(positive_lengths.min(), 200, 1000)
+    x = np.linspace(positive_lengths.min(), positive_lengths.max(), 1000)
     pdf = lognorm.pdf(x, shape, loc=loc, scale=scale)
 
-    # Plot histogram + lognormale fit
+    # Schaal naar percentage: pdf * 100 * binbreedte
+    bin_width = np.diff(bins)[0]  # bijvoorbeeld 1
+    pdf_scaled = pdf * 100 * bin_width
+
+    # Plot histogram met aangepaste bins
     plt.figure(figsize=(14, 5))
     sns.histplot(
         positive_lengths,
         bins=bins,
-        stat="probability",
+        stat="percent",
         color="skyblue",
         edgecolor="black",
         label="Data"
     )
 
-    plt.plot(x, pdf, "r", lw=2, label="Lognormale fit")
+    # Plot fit
+    plt.plot(x, pdf_scaled, "r", lw=2, label="Lognormale fit")
     plt.xlim(0, 200)
     xticks = list(range(0, 200, 20)) + [200]
     xtick_labels = [str(x) for x in xticks[:-1]] + ['200+']
     plt.xticks(xticks, xtick_labels)
 
+    # Extra labels
     plt.xlabel("Aantal tekens per bericht")
-    plt.ylabel("Kans")
+    plt.ylabel("Kans in %")
     plt.title("Lognormale fit op berichtlengte in de familiechat")
     plt.legend()
     plt.tight_layout()
