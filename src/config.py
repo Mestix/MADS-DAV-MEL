@@ -4,11 +4,12 @@ from pathlib import Path
 import pandas as pd
 
 class Config(BaseModel):
-    processed: str
-    current: str
-    author_info: str | None = None
-    config_path: Path | None = None 
-    img_folder: str | None = None
+    processed_dir: Path
+    current: Path
+    input_path: Path 
+    author_info_path: Path 
+    config_path: Path
+    img_folder: Path
 
     @classmethod
     def load(cls, path: Path):

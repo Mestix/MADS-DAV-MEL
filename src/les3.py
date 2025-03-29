@@ -46,7 +46,7 @@ def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path):
     plt.tight_layout()
 
     plt.savefig(output_path, bbox_inches="tight")
-    logger.info(f"Grafiek opgeslagen als: {output_path}")
+    logger.info(f"Afbeelding opgeslagen als: {output_path}")
 
 # Visualisatie 2: Zoom in op de 2 weken vóór carnaval
 def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path):
@@ -91,7 +91,7 @@ def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path):
     plt.tight_layout()
 
     plt.savefig(output_path, bbox_inches="tight")
-    logger.info(f"Detailgrafiek opgeslagen als: {output_path}")
+    logger.info(f"Afbeelding opgeslagen als: {output_path}")
 
 # Wrapper-functie die beide grafieken aanmaakt vanuit main.py
 def generate_time_charts(df: pd.DataFrame, output_dir: Path):

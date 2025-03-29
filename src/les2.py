@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
+def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path):
     if df.empty:
         logger.warning("Dataframe is leeg. Kan geen grafiek genereren.")
         return
@@ -59,8 +59,10 @@ def generate_question_bar_chart(df: pd.DataFrame, output_path: Path):
     ]
 
     plt.legend(handles=legend_handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
-
+    
+    output_path = img_folder / "les2_meeste_vragen_gesteld.png"
     plt.savefig(output_path, bbox_inches="tight")  # Zorgt dat alles in beeld blijft
+    
     plt.close()
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
 
