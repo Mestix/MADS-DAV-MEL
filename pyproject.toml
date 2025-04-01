@@ -12,6 +12,7 @@ dependencies = [
     "jupyterlab>=4.3.6",
     "loguru>=0.7.3",
     "nbformat>=5.10.4",
+    "nltk>=3.9.1",
     "numpy>=2.2.1",
     "pandas>=2.2.3",
     "plotly>=5.24.1",
