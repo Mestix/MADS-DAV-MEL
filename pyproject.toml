@@ -23,3 +23,8 @@ dependencies = [
     "wa-analyzer",
 ]
 
+[dependency-groups]
+dev = [
+    "nbstripout>=0.8.1",
+]
+
