@@ -9,6 +9,8 @@ data/raw/*.parq
 *.parquet
 data/processed/*.csv
 data/processed/*.parq
+data/processed/*.txt
+data/processed/*.json
 *.log
 .DS_Store
 *.egg-infos
