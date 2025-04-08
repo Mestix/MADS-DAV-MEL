@@ -10,27 +10,27 @@ from preprocessor import Preprocessor
 from settings import Settings
 
 
-def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
+def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
     output_map = {
-        2: (img_folder, generate_question_bar_chart),
-        3: (img_folder, generate_time_charts),
-        4: (img_folder, generate_distribution_charts),
-        5: (img_folder, generate_relation_charts),
+        2: (img_folder, generate_question_bar_chart, settings.les2),
+        3: (img_folder, generate_time_charts, getattr(settings, "les3", {})),
+        4: (img_folder, generate_distribution_charts, getattr(settings, "les4", {})),
+        5: (img_folder, generate_relation_charts, getattr(settings, "les5", {})),
     }
 
     if lesson_number not in output_map:
         print(f"Les {lesson_number} wordt niet herkend.")
         return
 
-    img_folder, chart_func = output_map[lesson_number]
-    chart_func(df, img_folder)
+    img_folder, chart_func, lesson_settings = output_map[lesson_number]
+    chart_func(df, img_folder, lesson_settings)
 
 
 def run_all_charts(df, output_folder: Path):
-    run_chart_for_lesson(2, df, output_folder)
-    run_chart_for_lesson(3, df, output_folder)
-    run_chart_for_lesson(4, df, output_folder)
-    run_chart_for_lesson(5, df, output_folder)
+    run_chart_for_lesson(2, df, output_folder, settings)
+    # run_chart_for_lesson(3, df, output_folder)
+    # run_chart_for_lesson(4, df, output_folder)
+    # run_chart_for_lesson(5, df, output_folder)
 
 
 if __name__ == "__main__":
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     df = whatsapp_processor.run()
 
     if args.les:
-        run_chart_for_lesson(args.les, df, img_folder)
+        run_chart_for_lesson(args.les, df, img_folder, settings)
     elif args.all:
         run_all_charts(df, img_folder)
     else:

@@ -35,3 +35,13 @@ emoji_count = "emoji_count"
 message_length = "message_length"
 is_carnaval = "is_carnaval"
 date = "date"
+
+[les2]
+columns = { author = "author", message = "message" }
+highlight_users = { me = "laughing-cat", inlaw = "decorated-shark" }
+output_image = "les2_meeste_vragen_gesteld.png"
+
+[les2.annotation]
+user = "decorated-shark"
+text = """Mijn schoonmoeder:
+"Wie komt er eten?" =P"""
