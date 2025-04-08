@@ -1,9 +1,12 @@
 pre-commit:
   parallel: true
   commands:
-    clear-notebook-outputs:
+    notebook-clean-check:
       run: |
-        find . -name "*.ipynb" -not -path "./.venv/*" -exec jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace {} \;
+        FILES=$(find . -name "*.ipynb" -not -path "./.venv/*")
+        if [ -n "$FILES" ]; then
+          echo "$FILES" | xargs -n 1 nbstripout --check
+        fi
     black:
       run: black . --check
     isort:

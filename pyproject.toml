@@ -30,5 +30,6 @@ dev = [
     "isort>=6.0.1",
     "jupyter>=1.1.1",
     "lefthook>=1.11.8",
+    "nbstripout>=0.8.1",
 ]
 

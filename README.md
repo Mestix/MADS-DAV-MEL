@@ -13,3 +13,6 @@ analyzer --device ios
 
 Run visualisation
 python src/main.py <function>
+
+Run lefthook pre commit on staged files
+lefthook run pre-commit
