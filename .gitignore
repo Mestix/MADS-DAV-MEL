@@ -9,13 +9,8 @@ data/raw/*.parq
 *.parquet
 data/processed/*.csv
 data/processed/*.parq
-data/processed/*.txt
 *.log
-*.pptx
 .DS_Store
-*.egg-info
-*reference.json
-.lycheecache
+*.egg-infos
 .notebookcache
-**/personal.ipynb
 config.toml
