@@ -1,13 +1,15 @@
+import warnings
+from pathlib import Path
+
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from pathlib import Path
 from loguru import logger
-import numpy as np
 from scipy.stats import lognorm
-import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+
 
 def generate_message_length_distribution(df: pd.DataFrame, output_path: Path):
     if df.empty:
@@ -16,8 +18,8 @@ def generate_message_length_distribution(df: pd.DataFrame, output_path: Path):
 
     # Bepaal berichtlengtes
     df = df.copy()
-    df['message_length'] = df['message'].astype(str).str.len()
-    message_lengths = df['message_length']
+    df["message_length"] = df["message"].astype(str).str.len()
+    message_lengths = df["message_length"]
     positive_lengths = message_lengths[message_lengths > 0]
 
     # Maak bins: 0–200 in stappen van 3 + alles daarboven in 1 bin
@@ -40,14 +42,14 @@ def generate_message_length_distribution(df: pd.DataFrame, output_path: Path):
         stat="percent",
         color="skyblue",
         edgecolor="black",
-        label="Data"
+        label="Data",
     )
 
     # Plot fit
     plt.plot(x, pdf_scaled, "r", lw=2, label="Lognormale fit")
     plt.xlim(0, 200)
     xticks = list(range(0, 200, 20)) + [200]
-    xtick_labels = [str(x) for x in xticks[:-1]] + ['200+']
+    xtick_labels = [str(x) for x in xticks[:-1]] + ["200+"]
     plt.xticks(xticks, xtick_labels)
 
     # Extra labels
@@ -61,9 +63,12 @@ def generate_message_length_distribution(df: pd.DataFrame, output_path: Path):
     logger.info(f"Afbeelding opgeslagen als: {output_path}")
     plt.close()
 
+
 def generate_distribution_charts(df: pd.DataFrame, output_dir: Path):
     if df.empty:
         logger.warning("Dataframe is leeg. Geen visualisaties gegenereerd.")
         return
 
-    generate_message_length_distribution(df, output_dir / "les4_berichtlengte_distributie.png")
+    generate_message_length_distribution(
+        df, output_dir / "les4_berichtlengte_distributie.png"
+    )

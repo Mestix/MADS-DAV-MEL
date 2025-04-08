@@ -1,0 +1,13 @@
+pre-commit:
+  parallel: true
+  commands:
+    notebook-clean:
+      run: |
+        FILES=$(find . -name "*.ipynb" -not -path "./.venv/*")
+        if [ -n "$FILES" ]; then
+          echo "$FILES" | xargs -n 1 nbstripout
+        fi
+    black:
+      run: black .
+    isort:
+      run: isort .

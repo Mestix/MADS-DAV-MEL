@@ -1,7 +1,10 @@
 from pathlib import Path
-from loguru import logger
+
 import pandas as pd
+from loguru import logger
+
 from config import Config
+
 
 def load_data_parquet(config: Config) -> pd.DataFrame:
     # Vind de projectroot: map waarin 'config.toml' staat
@@ -15,6 +18,7 @@ def load_data_parquet(config: Config) -> pd.DataFrame:
 
     return pd.read_parquet(datafile)
 
+
 def load_data_csv(config: Config) -> pd.DataFrame:
     root = config.config_path
     config = config
@@ -26,7 +30,7 @@ def load_data_csv(config: Config) -> pd.DataFrame:
     if not inputfile.exists():
         logger.warning(f"{inputfile} bestaat niet.")
         return False
-    
+
     try:
         df = pd.read_csv(inputfile, parse_dates=["timestamp"])
     except Exception as e:
@@ -36,6 +40,7 @@ def load_data_csv(config: Config) -> pd.DataFrame:
     logger.info(f"Data geladen met {len(df)} rijen.")
 
     return df
+
 
 def load_author_info(config: Config) -> pd.DataFrame:
     root = config.config_path
@@ -53,5 +58,5 @@ def load_author_info(config: Config) -> pd.DataFrame:
     if not expected_cols.issubset(info_df.columns):
         logger.error(f"Verwachte kolommen ontbreken in {authorinfo}")
         return
-    
+
     return info_df
