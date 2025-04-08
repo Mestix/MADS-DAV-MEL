@@ -1,11 +1,13 @@
 import argparse
 from pathlib import Path
+
+from config import Config
 from les2 import generate_question_bar_chart
+from les3 import generate_time_charts
 from les4 import generate_distribution_charts
 from les5 import generate_relation_charts
 from preprocessor import Preprocessor
-from config import Config
-from les3 import generate_time_charts
+
 
 def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
     output_map = {
@@ -22,16 +24,26 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
     img_folder, chart_func = output_map[lesson_number]
     chart_func(df, img_folder)
 
+
 def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(2, df, output_folder)
     run_chart_for_lesson(3, df, output_folder)
     run_chart_for_lesson(4, df, output_folder)
     run_chart_for_lesson(5, df, output_folder)
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Draai preprocessing of lesvisualisaties")
-    parser.add_argument("--les", type=int, help="Genereer visualisatie voor specifieke les (bijv. 2 of 5)")
-    parser.add_argument("--all", action="store_true", help="Genereer alle visualisaties in één keer")
+    parser = argparse.ArgumentParser(
+        description="Draai preprocessing of lesvisualisaties"
+    )
+    parser.add_argument(
+        "--les",
+        type=int,
+        help="Genereer visualisatie voor specifieke les (bijv. 2 of 5)",
+    )
+    parser.add_argument(
+        "--all", action="store_true", help="Genereer alle visualisaties in één keer"
+    )
     args = parser.parse_args()
 
     config_path = Path("./config.toml").resolve()

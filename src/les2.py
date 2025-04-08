@@ -1,11 +1,13 @@
+import warnings
+from pathlib import Path
+
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import pandas as pd
-from pathlib import Path
 from loguru import logger
-import matplotlib.patches as mpatches
-import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+
 
 def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path):
     if df.empty:
@@ -19,9 +21,11 @@ def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path):
 
     # "laughing-cat" wordt rood, "decorated-shark" wordt blauw
     colors = [
-        "red" if author == "laughing-cat" else 
-        "blue" if author == "decorated-shark" else 
-        "grey" 
+        (
+            "red"
+            if author == "laughing-cat"
+            else "blue" if author == "decorated-shark" else "grey"
+        )
         for author in vraag_count["author"]
     ]
 
@@ -39,23 +43,28 @@ def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path):
 
         plt.xlim(right=x_value + 10)
         plt.annotate(
-            "Mijn schoonmoeder:\n\"Wie komt er eten?\" =P",
+            'Mijn schoonmoeder:\n"Wie komt er eten?" =P',
             xy=(x_value, y_pos),
             xytext=(x_value + 8, y_pos),
-            arrowprops=dict(facecolor='blue', arrowstyle="->"),
+            arrowprops=dict(facecolor="blue", arrowstyle="->"),
             fontsize=12,
             color="blue",
-            bbox=dict(boxstyle="round,pad=0.3", edgecolor="blue", facecolor="white")
+            bbox=dict(boxstyle="round,pad=0.3", edgecolor="blue", facecolor="white"),
         )
 
     plt.subplots_adjust(right=0.75)
 
     legend_handles = [
-        mpatches.Patch(color='red', label='Ik'),
-        mpatches.Patch(color='blue', label='Mijn Schoonmoeder'),
-        mpatches.Patch(color='grey', label='Overige groepsleden')
+        mpatches.Patch(color="red", label="Ik"),
+        mpatches.Patch(color="blue", label="Mijn Schoonmoeder"),
+        mpatches.Patch(color="grey", label="Overige groepsleden"),
     ]
-    plt.legend(handles=legend_handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
+    plt.legend(
+        handles=legend_handles,
+        title="Legenda",
+        loc="lower right",
+        bbox_to_anchor=(1, 0),
+    )
 
     output_path = img_folder / "les2_meeste_vragen_gesteld.png"
     plt.savefig(output_path, bbox_inches="tight")

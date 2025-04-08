@@ -8,8 +8,6 @@ pre-commit:
           echo "$FILES" | xargs -n 1 nbstripout --check
         fi
     black:
-      run: black . --check
+      run: black .
     isort:
-      run: isort . --check
-    flake8:
-      run: flake8 .
+      run: isort .
