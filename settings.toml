@@ -1,0 +1,37 @@
+[preprocessing]
+start_date = "2023-09-01"
+
+enabled_steps = [
+  "clean_authors",
+  "anonymize_authors",
+  "add_message_length",
+  "add_author_info",
+  "filter_automatic_messages",
+  "filter_messages_after_start_date",
+  "set_has_emoji",
+  "set_is_carnaval"
+]
+
+[preprocessing.auto_messages]
+keywords = [
+  "afbeelding weggelaten",
+  "media weggelaten",
+  "document weggelaten",
+  "oproep gemist",
+  "bericht is verwijderd",
+  "video weggelaten",
+  "audio weggelaten",
+]
+
+[preprocessing.carnaval]
+"2024" = ["2024-02-08", "2024-02-15"]
+"2025" = ["2025-02-27", "2025-03-04"]
+
+[preprocessing.columns]
+author = "author"
+message = "message"
+timestamp = "timestamp"
+emoji_count = "emoji_count"
+message_length = "message_length"
+is_carnaval = "is_carnaval"
+date = "date"

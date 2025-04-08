@@ -7,6 +7,7 @@ from les3 import generate_time_charts
 from les4 import generate_distribution_charts
 from les5 import generate_relation_charts
 from preprocessor import Preprocessor
+from settings import Settings
 
 
 def run_chart_for_lesson(lesson_number: int, df, img_folder: Path):
@@ -46,12 +47,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    config_path = Path("./config.toml").resolve()
-    config = Config.load(config_path)
+    config = Config.load(Path("./config.toml").resolve())
+    settings = Settings.load(Path("./settings.toml").resolve())
 
     img_folder = Path(config.img_folder)
 
-    whatsapp_processor = Preprocessor(config)
+    whatsapp_processor = Preprocessor(config, settings)
     df = whatsapp_processor.run()
 
     if args.les:

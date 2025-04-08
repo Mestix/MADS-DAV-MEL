@@ -12,6 +12,7 @@ class Config(BaseModel):
     author_info_path: Path
     config_path: Path
     img_folder: Path
+    anon_reference: Path
 
     @classmethod
     def load(cls, path: Path):

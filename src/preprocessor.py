@@ -1,134 +1,132 @@
 import json
-import re
-from datetime import datetime
-
 import emoji
 import pandas as pd
+from datetime import datetime
 from loguru import logger
-from wa_analyzer.humanhasher import humanize
 
 from config import Config
-from dataloader import load_author_info, load_data_csv
+from settings import Settings
+from dataloader import load_data_csv, load_author_info
 
 
 class Preprocessor:
-    def __init__(self, config: Config):
+    """
+    Verwerkt WhatsApp-berichten op basis van een Config- en Settings-object.
+    Voert een volledige preprocess-pipeline uit, gestuurd door settings.toml.
+    """
+
+    def __init__(self, config: Config, settings: Settings):
+        """Initialiseer Preprocessor met config- en settingsobject."""
         self.config = config
+        self.settings = settings
+        self.columns = settings.columns
         self.df = load_data_csv(config)
         self.processed_dir = config.processed_dir
 
+        # Initiele parameters
+        self.auto_msgs = self.settings.auto_messages["keywords"]
+        self.start_date = pd.to_datetime(self.settings.start_date).date()
+        self.carnaval_ranges = [
+            (pd.to_datetime(d[0]).date(), pd.to_datetime(d[1]).date())
+            for d in self.settings.carnaval.values()
+        ]
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    #    1. Opschonen en anonimiseren
+    # ─────────────────────────────────────────────────────────────────────────────
+
     def clean_authors(self):
-        """Verwijder ongewenste tekens aan het begin van auteur-namen."""
-        if "author" not in self.df.columns:
-            logger.error("Kolom 'author' ontbreekt in de data.")
+        """Verwijder speciale tekens aan het begin van auteursnamen."""
+        if self.columns.author not in self.df.columns:
+            logger.error(f"Kolom '{self.columns.author}' ontbreekt.")
             return
 
-        tilde_pattern = r"^~\u202f"
-        self.df["author"] = (
-            self.df["author"].astype(str).apply(lambda x: re.sub(tilde_pattern, "", x))
+        pattern = r"^~\u202f"
+        self.df[self.columns.author] = (
+            self.df[self.columns.author].astype(str).str.replace(pattern, "", regex=True)
         )
         logger.info("Authors opgeschoond.")
 
     def anonymize_authors(self):
-        """Anonymiseer auteursnamen en sla de referentie op."""
-        authors = self.df["author"].unique()
+        """Anonimiseer auteursnamen met unieke namen en sla mapping op."""
+        from wa_analyzer.humanhasher import humanize
+
+        authors = self.df[self.columns.author].unique()
         anon_map = {author: humanize(author) for author in authors}
 
         if len(anon_map) != len(authors):
-            logger.warning(
-                "Er is een probleem met het aantal unieke auteurs na anonymisatie."
-            )
+            logger.warning("Aantal unieke auteurs na anonymisatie klopt niet.")
 
-        # Sla de referentielijst op
-        reference_file = self.processed_dir / "anon_reference.json"
-        ref_sorted = {v: k for k, v in sorted((v, k) for k, v in anon_map.items())}
+        ref_file = self.processed_dir / self.config.anon_reference
         self.processed_dir.mkdir(parents=True, exist_ok=True)
+        ref_sorted = {v: k for k, v in sorted((v, k) for k, v in anon_map.items())}
 
-        with open(reference_file, "w", encoding="utf-8") as f:
+        with open(ref_file, "w", encoding="utf-8") as f:
             json.dump(ref_sorted, f, ensure_ascii=False, indent=2)
 
-        self.df["author"] = self.df["author"].map(anon_map)
-        logger.info(f"{len(authors)} auteurs geanonimiseerd.")
+        self.df[self.columns.author] = self.df[self.columns.author].map(anon_map)
+        logger.info("Auteurs geanonimiseerd.")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    #    2. Informatie verrijking
+    # ─────────────────────────────────────────────────────────────────────────────
 
     def add_message_length(self):
         """Voeg kolom toe met lengte van elk bericht."""
-        self.df["message_length"] = self.df["message"].astype(str).str.len()
-        logger.info("Kolom 'message_length' toegevoegd met lengte van elk bericht.")
+        self.df[self.columns.message_length] = self.df[self.columns.message].astype(str).str.len()
+        logger.info("Kolom 'message_length' toegevoegd.")
 
     def add_author_info(self):
-        """Voeg leeftijd en geslacht en trouwstatus toe aan auteurs."""
-        author_info = load_author_info(self.config)
-        self.df = self.df.merge(author_info, on="author", how="left")
-        logger.info(
-            f"Auteur-info toegevoegd voor {self.df['author'].nunique()} auteurs."
-        )
-
-    def filter_automatic_messages(self):
-        """Verwijder automatische systeemberichten."""
-        auto_msgs = [
-            "afbeelding weggelaten",
-            "media weggelaten",
-            "document weggelaten",
-            "oproep gemist",
-            "bericht is verwijderd",
-            "video weggelaten",
-            "audio weggelaten",
-        ]
-        pattern = "|".join(auto_msgs)
-        initial_count = len(self.df)
-        self.df = self.df[
-            ~self.df["message"].astype(str).str.contains(pattern, case=False, na=False)
-        ]
-        logger.info(
-            f"{initial_count - len(self.df)} automatische berichten verwijderd."
-        )
-
-    def filter_messages_after_september_2023(self):
-        """Filter berichten vanaf 1 september 2023."""
-        if "timestamp" not in self.df.columns:
-            logger.error("Kolom 'timestamp' ontbreekt in de data.")
-            return
-
-        self.df["timestamp"] = pd.to_datetime(self.df["timestamp"], errors="coerce")
-        initial_count = len(self.df)
-        self.df = self.df[self.df["timestamp"].dt.date >= datetime(2023, 9, 1).date()]
-        logger.info(
-            f"{initial_count - len(self.df)} berichten vóór 1 september 2023 verwijderd."
-        )
-
-    def set_is_carnaval(self):
-        # Zorgt dat timestamp en date kolommen goed staan
-        self.df["timestamp"] = pd.to_datetime(self.df["timestamp"])
-        self.df["date"] = self.df["timestamp"].dt.date
-
-        # Definieert carnavalsperiodes
-        carnaval_2024 = (
-            pd.to_datetime("2024-02-08").date(),
-            pd.to_datetime("2024-02-15").date(),
-        )
-        carnaval_2025 = (
-            pd.to_datetime("2025-02-27").date(),
-            pd.to_datetime("2025-03-04").date(),
-        )
-
-        # Voegt is_carnaval toe
-        def is_carnaval(date):
-            return (
-                carnaval_2024[0] <= date <= carnaval_2024[1]
-                or carnaval_2025[0] <= date <= carnaval_2025[1]
-            )
-
-        self.df["is_carnaval"] = self.df["date"].apply(is_carnaval)
+        """Voeg leeftijd, geslacht en andere info toe per auteur."""
+        info = load_author_info(self.config)
+        self.df = self.df.merge(info, on=self.columns.author, how="left")
+        logger.info("Auteur-info toegevoegd.")
 
     def set_has_emoji(self):
-        # has emoji
-        def count_emojis(text):
-            return len([char for char in str(text) if char in emoji.EMOJI_DATA])
+        """Voeg kolom toe met aantal emoji’s per bericht."""
+        def count_emojis(msg):
+            return len([c for c in str(msg) if c in emoji.EMOJI_DATA])
 
-        self.df["emoji_count"] = self.df["message"].apply(count_emojis)
+        self.df[self.columns.emoji_count] = self.df[self.columns.message].apply(count_emojis)
+        logger.info("Kolom 'emoji_count' toegevoegd.")
+
+    def set_is_carnaval(self):
+        """Markeer of het bericht in een carnavalsweek is verzonden."""
+        self.df[self.columns.timestamp] = pd.to_datetime(self.df[self.columns.timestamp])
+        self.df[self.columns.date] = self.df[self.columns.timestamp].dt.date
+
+        def is_carnaval(d):
+            return any(start <= d <= end for (start, end) in self.carnaval_ranges)
+
+        self.df[self.columns.is_carnaval] = self.df[self.columns.date].apply(is_carnaval)
+        logger.info("Kolom 'is_carnaval' toegevoegd.")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    #    3. Filteren en opschonen
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    def filter_automatic_messages(self):
+        """Verwijder standaard systeemberichten zoals 'media weggelaten'."""
+        pattern = "|".join(self.auto_msgs)
+        before = len(self.df)
+        self.df = self.df[
+            ~self.df[self.columns.message].astype(str).str.contains(pattern, case=False, na=False)
+        ]
+        logger.info(f"{before - len(self.df)} automatische berichten verwijderd.")
+
+    def filter_messages_after_start_date(self):
+        """Verwijder berichten die vóór de startdatum liggen."""
+        self.df[self.columns.timestamp] = pd.to_datetime(self.df[self.columns.timestamp], errors="coerce")
+        before = len(self.df)
+        self.df = self.df[self.df[self.columns.timestamp].dt.date >= self.start_date]
+        logger.info(f"{before - len(self.df)} oude berichten verwijderd.")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    #    4. Output opslaan
+    # ─────────────────────────────────────────────────────────────────────────────
 
     def save_output(self):
-        """Sla de verwerkte data op in CSV en Parquet formaat."""
+        """Sla de verwerkte data op als CSV en Parquet."""
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         output_csv = self.processed_dir / f"whatsapp-{timestamp}-processed.csv"
         output_parquet = output_csv.with_suffix(".parquet")
@@ -136,27 +134,28 @@ class Preprocessor:
         self.df.to_csv(output_csv, index=False)
         self.df.to_parquet(output_parquet, index=False)
 
-        logger.success(
-            f"Data opgeslagen:\n- CSV: {output_csv}\n- Parquet: {output_parquet}"
-        )
-        logger.info(
-            "Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!"
-        )
+        logger.success(f"Data opgeslagen:\n- {output_csv}\n- {output_parquet}")
+        logger.info("Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    #    5. Pipeline runner
+    # ─────────────────────────────────────────────────────────────────────────────
 
     def run(self):
-        """Voer het volledige preprocessing-pipeline uit."""
+        """
+        Voer alle stappen uit zoals gedefinieerd in settings.enabled_steps.
+        Automatisch ontdekt via methodenaam.
+        """
         if self.df is None or self.df.empty:
             logger.error("Dataframe is leeg of niet geladen.")
             return None
 
-        self.clean_authors()
-        self.anonymize_authors()
-        self.add_message_length()
-        self.add_author_info()
-        self.filter_automatic_messages()
-        self.filter_messages_after_september_2023()
-        self.set_has_emoji()
-        self.set_is_carnaval()
-        # self.save_output()
+        for step in self.settings.enabled_steps:
+            func = getattr(self, step, None)
+            if callable(func):
+                logger.info(f"▶️ Stap: {step}")
+                func()
+            else:
+                logger.warning(f"Stap '{step}' niet gevonden.")
 
         return self.df
