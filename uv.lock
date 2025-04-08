@@ -879,11 +879,14 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+<<<<<<< HEAD
     { name = "black" },
     { name = "flake8" },
     { name = "isort" },
     { name = "jupyter" },
     { name = "lefthook" },
+=======
+>>>>>>> main
     { name = "nbstripout" },
 ]
 
