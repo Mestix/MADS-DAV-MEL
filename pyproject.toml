@@ -24,3 +24,8 @@ dependencies = [
 
 [tool.uv.sources]
 wa-analyzer = { path = "libs/wa_analyzer-0.4.1-py3-none-any.whl" }
+
+[dependency-groups]
+dev = [
+    "nbstripout>=0.8.1",
+]
