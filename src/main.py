@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 
 from config import Config
+from dataloader import load_data_parquet
 from les2 import generate_question_bar_chart
 from les3 import generate_time_charts
 from les4 import generate_distribution_charts
@@ -13,7 +14,7 @@ from settings import Settings
 def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
     output_map = {
         2: (img_folder, generate_question_bar_chart, settings.les2),
-        3: (img_folder, generate_time_charts, getattr(settings, "les3", {})),
+        3: (img_folder, generate_time_charts, settings.les3),        
         4: (img_folder, generate_distribution_charts, getattr(settings, "les4", {})),
         5: (img_folder, generate_relation_charts, getattr(settings, "les5", {})),
     }
@@ -28,7 +29,7 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
 
 def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(2, df, output_folder, settings)
-    # run_chart_for_lesson(3, df, output_folder)
+    run_chart_for_lesson(3, df, output_folder, settings)
     # run_chart_for_lesson(4, df, output_folder)
     # run_chart_for_lesson(5, df, output_folder)
 
@@ -52,8 +53,10 @@ if __name__ == "__main__":
 
     img_folder = Path(config.img_folder)
 
-    whatsapp_processor = Preprocessor(config, settings)
-    df = whatsapp_processor.run()
+    # whatsapp_processor = Preprocessor(config, settings)
+    # df = whatsapp_processor.run()
+
+    df = load_data_parquet(config)
 
     if args.les:
         run_chart_for_lesson(args.les, df, img_folder, settings)

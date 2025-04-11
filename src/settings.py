@@ -1,10 +1,10 @@
 import tomllib
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 
 
-class ColumnMap(BaseModel):
+class Columns(BaseModel):
     author: str
     message: str
     timestamp: str
@@ -14,22 +14,33 @@ class ColumnMap(BaseModel):
     date: str
 
 
-class Settings(BaseModel):
+class PreprocessingSettings(BaseModel):
     start_date: str
+    enabled_steps: List[str]
     auto_messages: Dict[str, List[str]]
     carnaval: Dict[str, List[str]]
-    columns: ColumnMap
-    enabled_steps: List[str]
+    columns: Columns
+
+
+class Settings(BaseModel):
+    # Required
+    preprocessing: PreprocessingSettings
+
+    # Optional lesson-specific config
+    les2: Optional[Dict[str, Any]] = {}
+    les3: Optional[Dict[str, Any]] = {}
+
+    # Metadata
     settings_path: Path
 
-    les2: dict
-
     @classmethod
-    def load(cls, path: Path):
+    def load(cls, path: Path) -> "Settings":
         with path.open("rb") as f:
             data = tomllib.load(f)
+
         return cls(
-            **data["preprocessing"],
-            les2=data["les2"],
-            settings_path=path.resolve()
+            preprocessing=PreprocessingSettings(**data["preprocessing"]),
+            les2=data.get("les2", {}),
+            les3=data.get("les3", {}),
+            settings_path=path.resolve(),
         )

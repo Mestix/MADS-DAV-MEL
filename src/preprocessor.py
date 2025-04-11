@@ -18,8 +18,8 @@ class Preprocessor:
     def __init__(self, config: Config, settings: Settings):
         """Initialiseer Preprocessor met config- en settingsobject."""
         self.config = config
-        self.settings = settings
-        self.columns = settings.columns
+        self.settings = settings.preprocessing
+        self.columns = self.settings.columns
         self.df = load_data_csv(config)
         self.processed_dir = config.processed_dir
 
@@ -153,8 +153,11 @@ class Preprocessor:
         for step in self.settings.enabled_steps:
             func = getattr(self, step, None)
             if callable(func):
-                logger.info(f"▶️ Stap: {step}")
-                func()
+                logger.info(f"Stap: {step}")
+                try:
+                    func()
+                except Exception as e:
+                    logger.error(f"Fout bij stap '{step}': {e}")
             else:
                 logger.warning(f"Stap '{step}' niet gevonden.")
 

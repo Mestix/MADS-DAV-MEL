@@ -45,3 +45,7 @@ output_image = "les2_meeste_vragen_gesteld.png"
 user = "decorated-shark"
 text = """Mijn schoonmoeder:
 "Wie komt er eten?" =P"""
+
+[les3.output_files]
+weekly = "les3_weekactiviteit.png"
+detail = "les3_2weken_detail.png"
