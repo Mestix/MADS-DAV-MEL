@@ -1,7 +1,7 @@
 import matplotlib.patches as mpatches
+import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
-import pandas as pd
 
 
 def plot_horizontal_bar(
@@ -145,6 +145,7 @@ def plot_line_with_vertical_marker(
     else:
         plt.show()
 
+
 def plot_boxplot(
     data: pd.DataFrame,
     x_col: str,
@@ -174,6 +175,7 @@ def plot_boxplot(
     else:
         plt.show()
 
+
 def plot_heatmap(
     corr_matrix: pd.DataFrame,
     title: str,
@@ -186,11 +188,11 @@ def plot_heatmap(
 
     sns.heatmap(
         corr_matrix,
-        annot=True,        # Toon de getallen in de cellen
-        fmt=".2f",         # Rond getallen af op 2 decimalen
-        cmap="coolwarm",   # Kleurenpalet
-        linewidths=0.5,    # Witte lijnen tussen cellen
-        linecolor="white"
+        annot=True,  # Toon de getallen in de cellen
+        fmt=".2f",  # Rond getallen af op 2 decimalen
+        cmap="coolwarm",  # Kleurenpalet
+        linewidths=0.5,  # Witte lijnen tussen cellen
+        linecolor="white",
     )
 
     plt.title(title)
