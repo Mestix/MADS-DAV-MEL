@@ -29,6 +29,8 @@ class Settings(BaseModel):
     # Optional lesson-specific config
     les2: Optional[Dict[str, Any]] = {}
     les3: Optional[Dict[str, Any]] = {}
+    les5: Optional[Dict[str, Any]] = {}
+    les6: Optional[Dict[str, Any]] = {}
 
     # Metadata
     settings_path: Path
@@ -42,5 +44,7 @@ class Settings(BaseModel):
             preprocessing=PreprocessingSettings(**data["preprocessing"]),
             les2=data.get("les2", {}),
             les3=data.get("les3", {}),
+            les5=data.get("les5", {}),
+            les6=data.get("les6", {}),
             settings_path=path.resolve(),
         )

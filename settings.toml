@@ -20,7 +20,7 @@ keywords = [
   "oproep gemist",
   "bericht is verwijderd",
   "video weggelaten",
-  "audio weggelaten",
+  "audio weggelaten"
 ]
 
 [preprocessing.carnaval]
@@ -49,3 +49,27 @@ text = """Mijn schoonmoeder:
 [les3.output_files]
 weekly = "les3_weekactiviteit.png"
 detail = "les3_2weken_detail.png"
+
+[les5.columns]
+author = "author"
+emoji_count = "emoji_count"
+message_length = "message_length"
+age = "age"
+gender = "gender"
+is_inlaw = "is_inlaw"
+is_carnaval = "is_carnaval"
+timestamp = "timestamp"
+
+[les5.output_files]
+correlation = "les5_correlaties.png"
+carnaval_relation = "les5_carnaval_vs_aangetrouwd.png"
+
+[les6]
+chunk_size = 200
+min_chunks = 20
+perplexity = 30
+highlight_author = "sprightly-rhinoceros" 
+
+[les6.output_files]
+pca = "les6_pca_visualisatie.png"
+tsne = "les6_tsne_visualisatie.png"

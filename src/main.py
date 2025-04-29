@@ -7,6 +7,7 @@ from les2 import generate_question_bar_chart
 from les3 import generate_time_charts
 from les4 import generate_distribution_charts
 from les5 import generate_relation_charts
+from les6 import generate_les6_charts
 from preprocessor import Preprocessor
 from settings import Settings
 
@@ -16,7 +17,8 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
         2: (img_folder, generate_question_bar_chart, settings.les2),
         3: (img_folder, generate_time_charts, settings.les3),        
         4: (img_folder, generate_distribution_charts, getattr(settings, "les4", {})),
-        5: (img_folder, generate_relation_charts, getattr(settings, "les5", {})),
+        5: (img_folder, generate_relation_charts, settings.les5),
+        6: (img_folder, generate_les6_charts, settings.les6),
     }
 
     if lesson_number not in output_map:
@@ -30,9 +32,8 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
 def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(2, df, output_folder, settings)
     run_chart_for_lesson(3, df, output_folder, settings)
-    # run_chart_for_lesson(4, df, output_folder)
-    # run_chart_for_lesson(5, df, output_folder)
-
+    run_chart_for_lesson(5, df, output_folder, settings)
+    run_chart_for_lesson(5, df, output_folder, settings)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
