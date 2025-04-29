@@ -82,6 +82,16 @@ timestamp = "timestamp"
 correlation = "les5_correlaties.png"
 carnaval_relation = "les5_carnaval_vs_aangetrouwd.png"
 
+[les5.relation_chart]
+xlabel = "Is aangetrouwd?"
+ylabel = "Aandeel berichten tijdens carnaval"
+title = "Carnavalactiviteit: aangetrouwd versus niet"
+inlaw_label_mapping = { 0 = "Nee", 1 = "Ja" }
+palette = { "Nee" = "skyblue", "Ja" = "lightcoral" }
+
+[les5.correlation_chart]
+title = "Correlaties tussen persoonskenmerken en gedrag"
+
 [les6]
 chunk_size = 200
 min_chunks = 20

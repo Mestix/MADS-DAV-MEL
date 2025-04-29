@@ -1,6 +1,7 @@
 import matplotlib.patches as mpatches
 import seaborn as sns
 from matplotlib import pyplot as plt
+import pandas as pd
 
 
 def plot_horizontal_bar(
@@ -137,6 +138,63 @@ def plot_line_with_vertical_marker(
     plt.tight_layout()
 
     plt.legend(title=hue)
+
+    if output_path:
+        plt.savefig(output_path, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
+
+def plot_boxplot(
+    data: pd.DataFrame,
+    x_col: str,
+    y_col: str,
+    xlabel: str,
+    ylabel: str,
+    title: str,
+    palette: dict = None,
+    output_path: str = None,
+):
+
+    plt.figure()
+    sns.boxplot(
+        data=data,
+        x=x_col,
+        y=y_col,
+        # palette=palette
+    )
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
+
+def plot_heatmap(
+    corr_matrix: pd.DataFrame,
+    title: str,
+    output_path: str = None,
+):
+    """
+    Plot een heatmap voor correlaties.
+    """
+    plt.figure()
+
+    sns.heatmap(
+        corr_matrix,
+        annot=True,        # Toon de getallen in de cellen
+        fmt=".2f",         # Rond getallen af op 2 decimalen
+        cmap="coolwarm",   # Kleurenpalet
+        linewidths=0.5,    # Witte lijnen tussen cellen
+        linecolor="white"
+    )
+
+    plt.title(title)
+    plt.tight_layout()
 
     if output_path:
         plt.savefig(output_path, bbox_inches="tight")
