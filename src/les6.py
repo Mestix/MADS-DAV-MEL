@@ -41,9 +41,6 @@ def prepare_chunks(
     valid_authors = author_counts[author_counts >= min_chunks].index
     chunk_df = chunk_df[chunk_df["author"].isin(valid_authors)].reset_index(drop=True)
 
-    logger.info(
-        f"Chunks voorbereid: {len(chunk_df)} berichten van {chunk_df['author'].nunique()} auteurs."
-    )
     return chunk_df
 
 
@@ -68,7 +65,7 @@ def generate_les6_charts(df: pd.DataFrame, output_dir: Path, les6_settings: dict
     distance = manhattan_distances(X, X)
     labels = chunk_df["author"].reset_index(drop=True)
 
-    highlight_author = les6_settings.get("highlight_author", "sprightly-rhinoceros")
+    highlight_author: str = les6_settings.get("highlight_author", "")
 
     # === PCA plot
     pca = PCA(n_components=2)

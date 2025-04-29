@@ -115,12 +115,12 @@ tsne = "les6_tsne_visualisatie.png"
 
 [les6.pca_chart]
 title = "PCA Visualisatie schrijfstijl"
-highlight_color = "red"
+highlight_color = "#e76f51"
 other_color = "lightgrey"
 
 [les6.tsne_chart]
 title = "t-SNE Visualisatie schrijfstijl"
-highlight_color = "red"
+highlight_color = "#e76f51"
 other_color = "lightgrey"
 
 [plot]

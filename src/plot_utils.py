@@ -163,7 +163,7 @@ def plot_boxplot(
     "Maakt een eenvoudige boxplot met kleuren."
     plt.figure()
 
-    sns.boxplot(data=data, x=x_col, y=y_col, palette=palette)
+    sns.boxplot(data=data, x=x_col, y=y_col, palette=palette, hue=x_col)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
