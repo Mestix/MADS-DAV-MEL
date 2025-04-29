@@ -9,6 +9,7 @@ from config import Config
 from dataloader import load_author_info, load_data_csv
 from settings import Settings
 
+
 class Preprocessor:
     """
     Preprocessor voor WhatsApp-berichten.
