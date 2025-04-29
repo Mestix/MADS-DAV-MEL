@@ -86,8 +86,6 @@ carnaval_relation = "les5_carnaval_vs_aangetrouwd.png"
 xlabel = "Is aangetrouwd?"
 ylabel = "Aandeel berichten tijdens carnaval"
 title = "Carnavalactiviteit: aangetrouwd versus niet"
-inlaw_label_mapping = { 0 = "Nee", 1 = "Ja" }
-palette = { "Nee" = "skyblue", "Ja" = "lightcoral" }
 
 [les5.correlation_chart]
 title = "Correlaties tussen persoonskenmerken en gedrag"
