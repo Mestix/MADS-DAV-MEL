@@ -46,6 +46,14 @@ user = "decorated-shark"
 text = """Mijn schoonmoeder:
 "Wie komt er eten?" =P"""
 
+[les2.plot]
+colors = { me = "red", inlaw = "blue", other = "grey" }
+annotation = { arrow_color = "blue" }
+xlabel = "Aantal Vragen"
+ylabel = "Gebruiker"
+title = "Deze groepsleden stellen de meeste vragen"
+legend_labels = { me = "Ik", inlaw = "Mijn Schoonmoeder", other = "Overige groepsleden" }
+
 [les3.output_files]
 weekly = "les3_weekactiviteit.png"
 detail = "les3_2weken_detail.png"
@@ -73,3 +81,14 @@ highlight_author = "sprightly-rhinoceros"
 [les6.output_files]
 pca = "les6_pca_visualisatie.png"
 tsne = "les6_tsne_visualisatie.png"
+
+[plot]
+figsize = [8, 5]
+style = "whitegrid"
+palette = "tab10"
+grid = true
+context = "notebook"
+title_size = 14
+label_size = 12
+tick_size = 10
+legend_size = 10

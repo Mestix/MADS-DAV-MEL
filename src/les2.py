@@ -1,84 +1,64 @@
 from pathlib import Path
-
-import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
 import pandas as pd
 from loguru import logger
+from plot_settings import set_plot_style
+from plot_utils import plot_horizontal_bar
 
+def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_settings: dict):
+    """
+    Genereer een bar chart van aantal vragen per gebruiker, volledig gestuurd door settings.
+    """
 
-def generate_question_bar_chart(
-    df: pd.DataFrame, img_folder: Path, les2_settings: dict
-):
-    """
-    Genereer een horizontale staafgrafiek van het aantal vragen per gebruiker.
-    Gebruikt settings voor kleuring, annotatie en bestandsnaam.
-    """
+    set_plot_style()
+
     if df.empty:
         logger.warning("Dataframe is leeg. Kan geen grafiek genereren.")
         return
 
-    # Kolomnamen
     col_author = les2_settings["columns"]["author"]
     col_message = les2_settings["columns"]["message"]
 
     # Vragen tellen
     df["questions"] = df[col_message].apply(lambda x: str(x).count("?"))
-    vraag_count = df.groupby(col_author)["questions"].sum().reset_index()
-    vraag_count = vraag_count.sort_values(by="questions", ascending=False)
+    vraag_count = (
+        df.groupby(col_author)["questions"]
+        .sum()
+        .reset_index()
+        .sort_values(by="questions", ascending=False)
+    )
     vraag_count = vraag_count[vraag_count["questions"] > 0]
 
-    # Kleuren per gebruiker
+    if vraag_count.empty:
+        logger.warning("Geen vragen gevonden om te plotten.")
+        return
+
+    # Kleuren per persoon
+    colors_config = les2_settings["plot"]["colors"]
     me = les2_settings["highlight_users"]["me"]
     inlaw = les2_settings["highlight_users"]["inlaw"]
 
     colors = [
-        "red" if author == me else "blue" if author == inlaw else "grey"
+        colors_config["me"] if author == me else
+        colors_config["inlaw"] if author == inlaw else
+        colors_config["other"]
         for author in vraag_count[col_author]
     ]
 
+    output_path = img_folder / les2_settings["output_image"]
+
     # Plot
-    plt.figure(figsize=(10, 5))
-    plt.barh(vraag_count[col_author], vraag_count["questions"], color=colors)
-    plt.xlabel("Aantal Vragen")
-    plt.ylabel("Gebruiker")
-    plt.title("Deze groepsleden stellen de meeste vragen")
-    plt.gca().invert_yaxis()
-
-    # Annotatie voor inlaw
-    annotation_user = les2_settings["annotation"]["user"]
-    annotation_text = les2_settings["annotation"]["text"]
-
-    if annotation_user in vraag_count[col_author].values:
-        y_pos = list(vraag_count[col_author]).index(annotation_user)
-        x_value = vraag_count["questions"].iloc[y_pos]
-
-        plt.xlim(right=x_value + 10)
-        plt.annotate(
-            annotation_text,
-            xy=(x_value, y_pos),
-            xytext=(x_value + 8, y_pos),
-            arrowprops=dict(facecolor="blue", arrowstyle="->"),
-            fontsize=12,
-            color="blue",
-            bbox=dict(boxstyle="round,pad=0.3", edgecolor="blue", facecolor="white"),
-        )
-
-    # Legenda
-    plt.subplots_adjust(right=0.75)
-    legend_handles = [
-        mpatches.Patch(color="red", label="Ik"),
-        mpatches.Patch(color="blue", label="Mijn Schoonmoeder"),
-        mpatches.Patch(color="grey", label="Overige groepsleden"),
-    ]
-    plt.legend(
-        handles=legend_handles,
-        title="Legenda",
-        loc="lower right",
-        bbox_to_anchor=(1, 0),
+    plot_horizontal_bar(
+        vraag_count,
+        value_col="questions",
+        label_col=col_author,
+        colors=colors,
+        xlabel=les2_settings["plot"]["xlabel"],
+        ylabel=les2_settings["plot"]["ylabel"],
+        title=les2_settings["plot"]["title"],
+        annotation=les2_settings["annotation"],
+        legend_labels=les2_settings["plot"]["legend_labels"],
+        legend_colors=les2_settings["plot"]["colors"],
+        output_path=output_path,
     )
 
-    # Opslaan
-    output_path = img_folder / les2_settings["output_image"]
-    plt.savefig(output_path, bbox_inches="tight")
-    plt.close()
-    logger.info(f"Afbeelding opgeslagen als: {output_path}")
+    logger.success(f"Afbeelding opgeslagen als: {output_path}")
