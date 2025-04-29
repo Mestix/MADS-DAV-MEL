@@ -1,23 +1,31 @@
 from pathlib import Path
+
 import pandas as pd
 from loguru import logger
 from sklearn.decomposition import PCA
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import manhattan_distances
-from sklearn.feature_extraction.text import CountVectorizer
 
-from plot_utils import plot_pca_tsne
 from plot_settings import set_plot_style
+from plot_utils import plot_pca_tsne
 
-def prepare_chunks(df: pd.DataFrame, chunk_size: int = 200, min_chunks: int = 20) -> pd.DataFrame:
+
+def prepare_chunks(
+    df: pd.DataFrame, chunk_size: int = 200, min_chunks: int = 20
+) -> pd.DataFrame:
     """
     Maak tekstchunks van WhatsApp-berichten, gegroepeerd per auteur.
     """
-    grouped = df.groupby("author")["message"].apply(lambda x: " ".join(str(m) for m in x)).reset_index()
+    grouped = (
+        df.groupby("author")["message"]
+        .apply(lambda x: " ".join(str(m) for m in x))
+        .reset_index()
+    )
 
     def split_text(text, size):
         words = text.split()
-        return [" ".join(words[i: i + size]) for i in range(0, len(words), size)]
+        return [" ".join(words[i : i + size]) for i in range(0, len(words), size)]
 
     chunk_data = []
     for _, row in grouped.iterrows():
@@ -33,8 +41,11 @@ def prepare_chunks(df: pd.DataFrame, chunk_size: int = 200, min_chunks: int = 20
     valid_authors = author_counts[author_counts >= min_chunks].index
     chunk_df = chunk_df[chunk_df["author"].isin(valid_authors)].reset_index(drop=True)
 
-    logger.info(f"Chunks voorbereid: {len(chunk_df)} berichten van {chunk_df['author'].nunique()} auteurs.")
+    logger.info(
+        f"Chunks voorbereid: {len(chunk_df)} berichten van {chunk_df['author'].nunique()} auteurs."
+    )
     return chunk_df
+
 
 def generate_les6_charts(df: pd.DataFrame, output_dir: Path, les6_settings: dict):
     """
@@ -77,7 +88,9 @@ def generate_les6_charts(df: pd.DataFrame, output_dir: Path, les6_settings: dict
     )
 
     # === t-SNE plot
-    tsne = TSNE(n_components=2, perplexity=les6_settings.get("perplexity", 30), random_state=42)
+    tsne = TSNE(
+        n_components=2, perplexity=les6_settings.get("perplexity", 30), random_state=42
+    )
     X_tsne = tsne.fit_transform(distance)
     tsne_df = pd.DataFrame({"x": X_tsne[:, 0], "y": X_tsne[:, 1], "author": labels})
 

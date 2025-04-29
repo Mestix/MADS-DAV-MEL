@@ -1,8 +1,9 @@
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from loguru import logger
+
 
 def save_or_show(output_path: str = None):
     "Slaat grafiek op naar bestand of toont deze direct."
@@ -14,11 +15,20 @@ def save_or_show(output_path: str = None):
         plt.show()
         logger.info("Plot getoond op scherm.")
 
+
 def plot_horizontal_bar(
-    data, value_col, label_col, colors,
-    xlabel, ylabel, title,
-    annotation, legend_labels, legend_colors,
-    arrow_color, output_path
+    data,
+    value_col,
+    label_col,
+    colors,
+    xlabel,
+    ylabel,
+    title,
+    annotation,
+    legend_labels,
+    legend_colors,
+    arrow_color,
+    output_path,
 ):
     "Maakt een horizontale staafdiagram met annotatie en legenda."
     plt.figure()
@@ -42,20 +52,33 @@ def plot_horizontal_bar(
             arrowprops=dict(facecolor=arrow_color, arrowstyle="->"),
             fontsize=12,
             color=arrow_color,
-            bbox=dict(boxstyle="round,pad=0.3", edgecolor=arrow_color, facecolor="white"),
+            bbox=dict(
+                boxstyle="round,pad=0.3", edgecolor=arrow_color, facecolor="white"
+            ),
         )
 
-    handles = [mpatches.Patch(color=legend_colors[k], label=v) for k, v in legend_labels.items()]
-    plt.legend(handles=handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
+    handles = [
+        mpatches.Patch(color=legend_colors[k], label=v)
+        for k, v in legend_labels.items()
+    ]
+    plt.legend(
+        handles=handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0)
+    )
 
     plt.tight_layout()
     save_or_show(output_path)
 
+
 def plot_line_chart(
-    x, y, highlight_ranges,
-    xlabel, ylabel, title,
-    highlight_color, highlight_label,
-    output_path
+    x,
+    y,
+    highlight_ranges,
+    xlabel,
+    ylabel,
+    title,
+    highlight_color,
+    highlight_label,
+    output_path,
 ):
     "Maakt een lijnplot met optionele highlightblokken."
     plt.figure()
@@ -76,10 +99,9 @@ def plot_line_chart(
     plt.tight_layout()
     save_or_show(output_path)
 
+
 def plot_line_with_vertical_marker(
-    data, x, y, marker_position,
-    marker_label, xlabel, ylabel,
-    title, hue, output_path
+    data, x, y, marker_position, marker_label, xlabel, ylabel, title, hue, output_path
 ):
     "Maakt een lijnplot met een verticale marker."
     plt.figure()
@@ -95,6 +117,7 @@ def plot_line_with_vertical_marker(
     plt.tight_layout()
     save_or_show(output_path)
 
+
 def plot_boxplot(
     data: pd.DataFrame,
     x_col: str,
@@ -103,7 +126,7 @@ def plot_boxplot(
     ylabel: str,
     title: str,
     palette: dict,
-    output_path: str
+    output_path: str,
 ):
     "Maakt een eenvoudige boxplot met kleuren."
     plt.figure()
@@ -117,24 +140,24 @@ def plot_boxplot(
     plt.tight_layout()
     save_or_show(output_path)
 
-def plot_heatmap(
-    corr_matrix: pd.DataFrame,
-    title: str,
-    output_path: str
-):
+
+def plot_heatmap(corr_matrix: pd.DataFrame, title: str, output_path: str):
     "Maakt een heatmap van een correlatiematrix."
     plt.figure()
 
     sns.heatmap(
         corr_matrix,
-        annot=True, fmt=".2f",
+        annot=True,
+        fmt=".2f",
         cmap="coolwarm",
-        linewidths=0.5, linecolor="white"
+        linewidths=0.5,
+        linecolor="white",
     )
 
     plt.title(title)
     plt.tight_layout()
     save_or_show(output_path)
+
 
 def plot_pca_tsne(
     df: pd.DataFrame,
@@ -145,7 +168,7 @@ def plot_pca_tsne(
     title: str,
     highlight_color: str,
     other_color: str,
-    output_path: str
+    output_path: str,
 ):
     "Maakt een scatterplot voor PCA of t-SNE met 1 auteur gehighlight."
     plt.figure(figsize=(8, 5))
