@@ -65,7 +65,6 @@ def generate_question_bar_chart(
         annotation=les2_settings["annotation"],
         legend_labels=les2_settings["plot"]["legend_labels"],
         legend_colors=les2_settings["plot"]["colors"],
+        arrow_color = les2_settings["plot"]["arrow_color"],
         output_path=output_path,
     )
-
-    logger.success(f"Afbeelding opgeslagen als: {output_path}")

@@ -33,7 +33,7 @@ def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(2, df, output_folder, settings)
     run_chart_for_lesson(3, df, output_folder, settings)
     run_chart_for_lesson(5, df, output_folder, settings)
-    run_chart_for_lesson(5, df, output_folder, settings)
+    run_chart_for_lesson(6, df, output_folder, settings)
 
 
 if __name__ == "__main__":

@@ -42,10 +42,9 @@ def generate_relations_chart(df: pd.DataFrame, output_path: Path, settings: dict
         xlabel=cfg.get("xlabel", ""),
         ylabel=cfg.get("ylabel", ""),
         title=cfg.get("title", ""),
+        palette=cfg.get("palette", ""),
         output_path=output_path,
     )
-
-    logger.success(f"Boxplot opgeslagen als: {output_path}")
 
 
 # Functie om een correlatie-heatmap te genereren van meerdere variabelen
@@ -100,8 +99,6 @@ def generate_correlation_diagram(df: pd.DataFrame, output_path: Path, settings: 
 
     # Plot de heatmap
     plot_heatmap(corr_matrix=corr, title=title, output_path=output_path)
-
-    logger.success(f"Heatmap opgeslagen als: {output_path}")
 
 
 # Hoofdfunctie die zowel de correlatie-heatmap als de boxplot aanmaakt

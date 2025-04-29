@@ -1,150 +1,99 @@
 import matplotlib.patches as mpatches
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+from loguru import logger
 
+def save_or_show(output_path: str = None):
+    "Slaat grafiek op naar bestand of toont deze direct."
+    if output_path:
+        plt.savefig(output_path, bbox_inches="tight")
+        plt.close()
+        logger.success(f"Plot opgeslagen: {output_path}")
+    else:
+        plt.show()
+        logger.info("Plot getoond op scherm.")
 
 def plot_horizontal_bar(
-    data,
-    value_col,
-    label_col,
-    colors,
-    xlabel,
-    ylabel,
-    title,
-    annotation=None,
-    legend_labels=None,
-    output_path=None,
-    legend_colors=None,
+    data, value_col, label_col, colors,
+    xlabel, ylabel, title,
+    annotation, legend_labels, legend_colors,
+    arrow_color, output_path
 ):
-    """
-    Plot een horizontale staafdiagram met optionele annotatie en legenda.
-    """
+    "Maakt een horizontale staafdiagram met annotatie en legenda."
     plt.figure()
 
-    # Plot de staafdiagram
     plt.barh(data[label_col], data[value_col], color=colors)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
     plt.gca().invert_yaxis()
 
-    # Annotatie toevoegen (optioneel)
-    if annotation:
-        user = annotation.get("user")
-        text = annotation.get("text")
-        color = annotation.get("arrow_color", "blue")
-
-        if user in data[label_col].values:
-            y_pos = list(data[label_col]).index(user)
-            x_value = data[value_col].iloc[y_pos]
-
-            plt.xlim(right=x_value + 10)
-            plt.annotate(
-                text,
-                xy=(x_value, y_pos),
-                xytext=(x_value + 8, y_pos),
-                arrowprops=dict(facecolor=color, arrowstyle="->"),
-                fontsize=12,
-                color=color,
-                bbox=dict(boxstyle="round,pad=0.3", edgecolor=color, facecolor="white"),
-            )
-
-    # Legenda toevoegen (optioneel)
-    if legend_labels and legend_colors:
-        legend_handles = [
-            mpatches.Patch(color=legend_colors[key], label=label)
-            for key, label in legend_labels.items()
-        ]
-        plt.legend(
-            handles=legend_handles,
-            title="Legenda",
-            loc="lower right",
-            bbox_to_anchor=(1, 0),
+    user = annotation["user"]
+    text = annotation["text"]
+    if user in data[label_col].values:
+        y_pos = list(data[label_col]).index(user)
+        x_value = data[value_col].iloc[y_pos]
+        plt.xlim(right=x_value + 10)
+        plt.annotate(
+            text,
+            xy=(x_value, y_pos),
+            xytext=(x_value + 8, y_pos),
+            arrowprops=dict(facecolor=arrow_color, arrowstyle="->"),
+            fontsize=12,
+            color=arrow_color,
+            bbox=dict(boxstyle="round,pad=0.3", edgecolor=arrow_color, facecolor="white"),
         )
 
-    # Opslaan of tonen
-    if output_path:
-        plt.savefig(output_path, bbox_inches="tight")
-        plt.close()
-    else:
-        plt.show()
+    handles = [mpatches.Patch(color=legend_colors[k], label=v) for k, v in legend_labels.items()]
+    plt.legend(handles=handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
 
+    plt.tight_layout()
+    save_or_show(output_path)
 
 def plot_line_chart(
-    x,
-    y,
-    highlight_ranges=None,
-    xlabel="",
-    ylabel="",
-    title="",
-    output_path=None,
-    highlight_color="orange",
-    highlight_label="Highlight",
+    x, y, highlight_ranges,
+    xlabel, ylabel, title,
+    highlight_color, highlight_label,
+    output_path
 ):
-    """
-    Eenvoudige lijnplot met optionele highlight-blokken (bijv. carnavalperiodes).
-    """
+    "Maakt een lijnplot met optionele highlightblokken."
     plt.figure()
-    plt.plot(x, y, marker="o", label="Aantal berichten")
 
-    if highlight_ranges:
-        for start, end in highlight_ranges:
-            plt.axvspan(
-                start, end, color=highlight_color, alpha=0.3, label=highlight_label
-            )
+    plt.plot(x, y, marker="o", label="Aantal berichten")
+    for start, end in highlight_ranges:
+        plt.axvspan(start, end, color=highlight_color, alpha=0.3, label=highlight_label)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
     plt.xticks(rotation=45)
-    plt.tight_layout()
 
-    # Legenda opschonen
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
 
-    if output_path:
-        plt.savefig(output_path, bbox_inches="tight")
-        plt.close()
-    else:
-        plt.show()
-
+    plt.tight_layout()
+    save_or_show(output_path)
 
 def plot_line_with_vertical_marker(
-    data,
-    x,
-    y,
-    hue=None,
-    xlabel="",
-    ylabel="",
-    title="",
-    output_path=None,
-    marker_position=0,
-    marker_label="Marker",
+    data, x, y, marker_position,
+    marker_label, xlabel, ylabel,
+    title, hue, output_path
 ):
-    """
-    Lijnplot uit DataFrame, met verticale markerlijn (bijv. start carnaval).
-    """
+    "Maakt een lijnplot met een verticale marker."
     plt.figure()
-    sns.lineplot(data=data, x=x, y=y, hue=hue, marker="o")
 
+    sns.lineplot(data=data, x=x, y=y, hue=hue, marker="o")
     plt.axvline(marker_position, color="gray", linestyle="--", label=marker_label)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.tight_layout()
-
     plt.legend(title=hue)
 
-    if output_path:
-        plt.savefig(output_path, bbox_inches="tight")
-        plt.close()
-    else:
-        plt.show()
-
+    plt.tight_layout()
+    save_or_show(output_path)
 
 def plot_boxplot(
     data: pd.DataFrame,
@@ -153,53 +102,70 @@ def plot_boxplot(
     xlabel: str,
     ylabel: str,
     title: str,
-    palette: dict = None,
-    output_path: str = None,
+    palette: dict,
+    output_path: str
 ):
-
+    "Maakt een eenvoudige boxplot met kleuren."
     plt.figure()
-    sns.boxplot(
-        data=data,
-        x=x_col,
-        y=y_col,
-        # palette=palette
-    )
+
+    sns.boxplot(data=data, x=x_col, y=y_col, palette=palette)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
+
     plt.tight_layout()
-
-    if output_path:
-        plt.savefig(output_path, bbox_inches="tight")
-        plt.close()
-    else:
-        plt.show()
-
+    save_or_show(output_path)
 
 def plot_heatmap(
     corr_matrix: pd.DataFrame,
     title: str,
-    output_path: str = None,
+    output_path: str
 ):
-    """
-    Plot een heatmap voor correlaties.
-    """
+    "Maakt een heatmap van een correlatiematrix."
     plt.figure()
 
     sns.heatmap(
         corr_matrix,
-        annot=True,  # Toon de getallen in de cellen
-        fmt=".2f",  # Rond getallen af op 2 decimalen
-        cmap="coolwarm",  # Kleurenpalet
-        linewidths=0.5,  # Witte lijnen tussen cellen
-        linecolor="white",
+        annot=True, fmt=".2f",
+        cmap="coolwarm",
+        linewidths=0.5, linecolor="white"
     )
 
     plt.title(title)
     plt.tight_layout()
+    save_or_show(output_path)
 
-    if output_path:
-        plt.savefig(output_path, bbox_inches="tight")
-        plt.close()
-    else:
-        plt.show()
+def plot_pca_tsne(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    label_col: str,
+    highlight_label: str,
+    title: str,
+    highlight_color: str,
+    other_color: str,
+    output_path: str
+):
+    "Maakt een scatterplot voor PCA of t-SNE met 1 auteur gehighlight."
+    plt.figure(figsize=(8, 5))
+
+    sns.scatterplot(
+        data=df[df[label_col] != highlight_label],
+        x=x,
+        y=y,
+        color=other_color,
+        label="Andere auteurs",
+    )
+    sns.scatterplot(
+        data=df[df[label_col] == highlight_label],
+        x=x,
+        y=y,
+        color=highlight_color,
+        label=highlight_label,
+    )
+
+    plt.title(title)
+    plt.legend()
+    plt.tight_layout()
+    save_or_show(output_path)
