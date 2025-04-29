@@ -1,5 +1,6 @@
 import tomllib
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -23,7 +24,7 @@ class PlotSettings(BaseModel):
         return cls(**data["plot"])  # Zorg dat je in settings.toml een [plot] blok hebt!
 
 
-def set_plot_style(settings: PlotSettings = None):
+def set_plot_style(settings: Optional[PlotSettings] = None):
     """
     Zet de standaardstijl voor alle plots.
     """

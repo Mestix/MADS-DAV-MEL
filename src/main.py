@@ -19,7 +19,7 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
     chart_mapping = {
         2: (generate_question_bar_chart, settings.les2),
         3: (generate_time_charts, settings.les3),
-        4: (generate_distribution_charts, getattr(settings, "les4", {})),
+        4: (generate_distribution_charts, settings.les4),
         5: (generate_relation_charts, settings.les5),
         6: (generate_les6_charts, settings.les6),
     }
@@ -36,7 +36,7 @@ def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
 
 def run_all_charts(df, img_folder: Path, settings):
     "Voert alle gedefinieerde visualisaties achter elkaar uit."
-    for lesson in [2, 3, 5, 6]:
+    for lesson in [2, 3, 4, 5, 6]:
         run_chart_for_lesson(lesson, df, img_folder, settings)
 
 

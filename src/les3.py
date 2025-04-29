@@ -16,14 +16,17 @@ def generate_weekly_overview_chart(
     """
     set_plot_style()
 
-    df["week"] = df["timestamp"].dt.to_period("W").apply(lambda r: r.start_time.date())
+    columns: dict = chart_settings["columns"]
+    df["week"] = (
+        df[columns["timestamp"]].dt.to_period("W").apply(lambda r: r.start_time.date())
+    )
 
     # Tel berichten per week
     weekly_counts = df.groupby("week").size().reset_index(name="message_count")
 
     # Carnavalweken uit 'is_carnaval'
     carnaval_weken = (
-        df[df["is_carnaval"]]
+        df[df[columns["is_carnaval"]]]
         .drop_duplicates("week")
         .sort_values("week")["week"]
         .tolist()
@@ -56,7 +59,6 @@ def generate_carnaval_detail_chart(
     Zoomt in op berichten rond carnaval ([-14, +5 dagen]).
     """
     set_plot_style()
-
     df["date"] = df["timestamp"].dt.floor("D")
     df["year"] = df["timestamp"].dt.year
 

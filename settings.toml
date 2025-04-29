@@ -54,6 +54,7 @@ ylabel = "Gebruiker"
 title = "Deze groepsleden stellen de meeste vragen"
 legend_labels = { me = "Ik", inlaw = "Mijn Schoonmoeder", other = "Overige groepsleden" }
 
+
 [les3.output_files]
 weekly = "les3_weekactiviteit.png"
 detail = "les3_2weken_detail.png"
@@ -62,11 +63,22 @@ detail = "les3_2weken_detail.png"
 xlabel = "Week"
 ylabel = "Aantal berichten"
 title = "Activiteit per week rondom carnaval"
+columns = { is_carnaval = "is_carnaval", timestamp = "timestamp" }
 
 [les3.detail_chart]
 xlabel = "Dagen tot carnaval"
 ylabel = "Aantal berichten"
 title = "Activiteit rond start carnaval"
+
+[les4.output_files]
+week_distribution = "les4_week_distribution.png"
+
+[les4.plot]
+xlabel = "Dag van de week"
+ylabel = "Kans op bericht"
+title = "Kansverdeling van berichten over de week"
+highlight_color = "#457b9d"
+grey_color = "lightgrey"
 
 [les5.columns]
 author = "author"

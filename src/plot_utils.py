@@ -1,3 +1,5 @@
+from pathlib import Path
+from typing import Optional
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -5,7 +7,7 @@ import seaborn as sns
 from loguru import logger
 
 
-def save_or_show(output_path: str = None):
+def save_or_show(output_path: Optional[Path] = None):
     "Slaat grafiek op naar bestand of toont deze direct."
     if output_path:
         plt.savefig(output_path, bbox_inches="tight")
@@ -16,6 +18,7 @@ def save_or_show(output_path: str = None):
         logger.info("Plot getoond op scherm.")
 
 
+# Les 2
 def plot_horizontal_bar(
     data,
     value_col,
@@ -69,6 +72,7 @@ def plot_horizontal_bar(
     save_or_show(output_path)
 
 
+# Les 3
 def plot_line_chart(
     x,
     y,
@@ -118,6 +122,34 @@ def plot_line_with_vertical_marker(
     save_or_show(output_path)
 
 
+# Les 4
+def plot_distribution(
+    x_labels, y_values, xlabel, ylabel, title, highlight_color, grey_color, output_path
+):
+    """
+    Maakt een distributie-barplot waarbij top 3 hoogste kansen de highlight kleur krijgen en de rest lichtgrijs.
+    """
+    # Zet y_values om naar Series om makkelijk top 3 te pakken
+    y_series = pd.Series(y_values, index=x_labels)
+    top_3_labels = y_series.sort_values(ascending=False).index[:3]
+
+    # top 3 = highlight_color, rest = grey
+    colors = [
+        highlight_color if label in top_3_labels else grey_color for label in x_labels
+    ]
+
+    sns.barplot(x=x_labels, y=y_values, palette=colors, hue=x_labels, legend=False)
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    save_or_show(output_path)
+
+
+# Les 5
 def plot_boxplot(
     data: pd.DataFrame,
     x_col: str,
@@ -126,7 +158,7 @@ def plot_boxplot(
     ylabel: str,
     title: str,
     palette: dict,
-    output_path: str,
+    output_path: Path,
 ):
     "Maakt een eenvoudige boxplot met kleuren."
     plt.figure()
@@ -141,7 +173,7 @@ def plot_boxplot(
     save_or_show(output_path)
 
 
-def plot_heatmap(corr_matrix: pd.DataFrame, title: str, output_path: str):
+def plot_heatmap(corr_matrix: pd.DataFrame, title: str, output_path: Path):
     "Maakt een heatmap van een correlatiematrix."
     plt.figure()
 
@@ -159,6 +191,7 @@ def plot_heatmap(corr_matrix: pd.DataFrame, title: str, output_path: str):
     save_or_show(output_path)
 
 
+# Les 6
 def plot_pca_tsne(
     df: pd.DataFrame,
     x: str,
@@ -168,7 +201,7 @@ def plot_pca_tsne(
     title: str,
     highlight_color: str,
     other_color: str,
-    output_path: str,
+    output_path: Path,
 ):
     "Maakt een scatterplot voor PCA of t-SNE met 1 auteur gehighlight."
     plt.figure(figsize=(8, 5))

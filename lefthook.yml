@@ -8,8 +8,8 @@ pre-commit:
           echo "$FILES" | xargs -n 1 nbstripout
         fi
     black:
-      run: black .
+      run: black src/
     ruff:
-      run: ruff .
+      run: ruff check src/ --fix
     mypy:
       run: mypy src/
