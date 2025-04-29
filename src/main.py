@@ -15,7 +15,7 @@ from settings import Settings
 def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
     output_map = {
         2: (img_folder, generate_question_bar_chart, settings.les2),
-        3: (img_folder, generate_time_charts, settings.les3),        
+        3: (img_folder, generate_time_charts, settings.les3),
         4: (img_folder, generate_distribution_charts, getattr(settings, "les4", {})),
         5: (img_folder, generate_relation_charts, settings.les5),
         6: (img_folder, generate_les6_charts, settings.les6),
@@ -34,6 +34,7 @@ def run_all_charts(df, output_folder: Path):
     run_chart_for_lesson(3, df, output_folder, settings)
     run_chart_for_lesson(5, df, output_folder, settings)
     run_chart_for_lesson(5, df, output_folder, settings)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

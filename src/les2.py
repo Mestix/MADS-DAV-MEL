@@ -1,11 +1,14 @@
 from pathlib import Path
-import pandas as pd
-import matplotlib.pyplot as plt
+
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import pandas as pd
 from loguru import logger
 
 
-def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_settings: dict):
+def generate_question_bar_chart(
+    df: pd.DataFrame, img_folder: Path, les2_settings: dict
+):
     """
     Genereer een horizontale staafgrafiek van het aantal vragen per gebruiker.
     Gebruikt settings voor kleuring, annotatie en bestandsnaam.
@@ -29,9 +32,7 @@ def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_setting
     inlaw = les2_settings["highlight_users"]["inlaw"]
 
     colors = [
-        "red" if author == me
-        else "blue" if author == inlaw
-        else "grey"
+        "red" if author == me else "blue" if author == inlaw else "grey"
         for author in vraag_count[col_author]
     ]
 
@@ -69,7 +70,12 @@ def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_setting
         mpatches.Patch(color="blue", label="Mijn Schoonmoeder"),
         mpatches.Patch(color="grey", label="Overige groepsleden"),
     ]
-    plt.legend(handles=legend_handles, title="Legenda", loc="lower right", bbox_to_anchor=(1, 0))
+    plt.legend(
+        handles=legend_handles,
+        title="Legenda",
+        loc="lower right",
+        bbox_to_anchor=(1, 0),
+    )
 
     # Opslaan
     output_path = img_folder / les2_settings["output_image"]

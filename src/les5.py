@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -25,7 +26,9 @@ def generate_relations_chart(df: pd.DataFrame, output_path: Path, columns: dict)
     person_df = person_df[person_df[columns["is_inlaw"]].notna()]
 
     # Maak mooie labels voor de boxplot
-    person_df["is_inlaw_label"] = person_df[columns["is_inlaw"]].map({0: "Nee", 1: "Ja"})
+    person_df["is_inlaw_label"] = person_df[columns["is_inlaw"]].map(
+        {0: "Nee", 1: "Ja"}
+    )
 
     # Plot de boxplot
     plt.figure(figsize=(6, 5))
@@ -75,7 +78,9 @@ def generate_correlation_diagram(df: pd.DataFrame, output_path: Path, columns: d
     person_df = person_df.dropna()
 
     # Zet gender ('m' / 'f') om naar numeriek (0 / 1)
-    person_df["gender_num"] = person_df[columns["gender"]].str.lower().map({"m": 0, "f": 1})
+    person_df["gender_num"] = (
+        person_df[columns["gender"]].str.lower().map({"m": 0, "f": 1})
+    )
 
     # Bepaal correlaties tussen numerieke variabelen
     corr = person_df[

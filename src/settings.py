@@ -1,7 +1,8 @@
 import tomllib
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
 
 
 class Columns(BaseModel):

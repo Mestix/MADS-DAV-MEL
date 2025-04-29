@@ -1,12 +1,13 @@
 import json
+from datetime import datetime
+
 import emoji
 import pandas as pd
-from datetime import datetime
 from loguru import logger
 
 from config import Config
+from dataloader import load_author_info, load_data_csv
 from settings import Settings
-from dataloader import load_data_csv, load_author_info
 
 
 class Preprocessor:
@@ -43,7 +44,9 @@ class Preprocessor:
 
         pattern = r"^~\u202f"
         self.df[self.columns.author] = (
-            self.df[self.columns.author].astype(str).str.replace(pattern, "", regex=True)
+            self.df[self.columns.author]
+            .astype(str)
+            .str.replace(pattern, "", regex=True)
         )
         logger.info("Authors opgeschoond.")
 
@@ -73,7 +76,9 @@ class Preprocessor:
 
     def add_message_length(self):
         """Voeg kolom toe met lengte van elk bericht."""
-        self.df[self.columns.message_length] = self.df[self.columns.message].astype(str).str.len()
+        self.df[self.columns.message_length] = (
+            self.df[self.columns.message].astype(str).str.len()
+        )
         logger.info("Kolom 'message_length' toegevoegd.")
 
     def add_author_info(self):
@@ -84,21 +89,28 @@ class Preprocessor:
 
     def set_has_emoji(self):
         """Voeg kolom toe met aantal emoji’s per bericht."""
+
         def count_emojis(msg):
             return len([c for c in str(msg) if c in emoji.EMOJI_DATA])
 
-        self.df[self.columns.emoji_count] = self.df[self.columns.message].apply(count_emojis)
+        self.df[self.columns.emoji_count] = self.df[self.columns.message].apply(
+            count_emojis
+        )
         logger.info("Kolom 'emoji_count' toegevoegd.")
 
     def set_is_carnaval(self):
         """Markeer of het bericht in een carnavalsweek is verzonden."""
-        self.df[self.columns.timestamp] = pd.to_datetime(self.df[self.columns.timestamp])
+        self.df[self.columns.timestamp] = pd.to_datetime(
+            self.df[self.columns.timestamp]
+        )
         self.df[self.columns.date] = self.df[self.columns.timestamp].dt.date
 
         def is_carnaval(d):
             return any(start <= d <= end for (start, end) in self.carnaval_ranges)
 
-        self.df[self.columns.is_carnaval] = self.df[self.columns.date].apply(is_carnaval)
+        self.df[self.columns.is_carnaval] = self.df[self.columns.date].apply(
+            is_carnaval
+        )
         logger.info("Kolom 'is_carnaval' toegevoegd.")
 
     # ─────────────────────────────────────────────────────────────────────────────
@@ -110,13 +122,17 @@ class Preprocessor:
         pattern = "|".join(self.auto_msgs)
         before = len(self.df)
         self.df = self.df[
-            ~self.df[self.columns.message].astype(str).str.contains(pattern, case=False, na=False)
+            ~self.df[self.columns.message]
+            .astype(str)
+            .str.contains(pattern, case=False, na=False)
         ]
         logger.info(f"{before - len(self.df)} automatische berichten verwijderd.")
 
     def filter_messages_after_start_date(self):
         """Verwijder berichten die vóór de startdatum liggen."""
-        self.df[self.columns.timestamp] = pd.to_datetime(self.df[self.columns.timestamp], errors="coerce")
+        self.df[self.columns.timestamp] = pd.to_datetime(
+            self.df[self.columns.timestamp], errors="coerce"
+        )
         before = len(self.df)
         self.df = self.df[self.df[self.columns.timestamp].dt.date >= self.start_date]
         logger.info(f"{before - len(self.df)} oude berichten verwijderd.")
@@ -135,7 +151,9 @@ class Preprocessor:
         self.df.to_parquet(output_parquet, index=False)
 
         logger.success(f"Data opgeslagen:\n- {output_csv}\n- {output_parquet}")
-        logger.info("Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!")
+        logger.info(
+            "Vergeet niet je config.toml bij te werken met de nieuwe bestandsnaam!"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────────
     #    5. Pipeline runner

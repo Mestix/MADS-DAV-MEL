@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -13,11 +14,7 @@ def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path):
     df["week"] = df["timestamp"].dt.to_period("W").apply(lambda r: r.start_time.date())
 
     # Tel berichten per week
-    weekly_counts = (
-        df.groupby("week")
-        .size()
-        .reset_index(name="message_count")
-    )
+    weekly_counts = df.groupby("week").size().reset_index(name="message_count")
 
     # Carnavalweken uit 'is_carnaval'-kolom
     carnaval_weken = (
@@ -35,7 +32,7 @@ def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path):
         weekly_counts["week"],
         weekly_counts["message_count"],
         color="tab:blue",
-        label="Aantal berichten per week"
+        label="Aantal berichten per week",
     )
 
     # Carnaval visueel markeren
