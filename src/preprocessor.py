@@ -9,11 +9,18 @@ from config import Config
 from dataloader import load_author_info, load_data_csv
 from settings import Settings
 
-
 class Preprocessor:
     """
-    Verwerkt WhatsApp-berichten op basis van een Config- en Settings-object.
-    Voert een volledige preprocess-pipeline uit, gestuurd door settings.toml.
+    Preprocessor voor WhatsApp-berichten.
+
+    Voert een volledige preprocessing pipeline uit:
+    - Anonimiseert auteurs
+    - Verrijkt berichten met extra informatie
+    - Filtert ongewenste berichten
+    - Markeert berichten binnen carnavalsweken
+    - Slaat de verwerkte dataset op
+
+    Aangestuurd via een Settings-configuratie.
     """
 
     def __init__(self, config: Config, settings: Settings):
@@ -42,7 +49,7 @@ class Preprocessor:
             logger.error(f"Kolom '{self.columns.author}' ontbreekt.")
             return
 
-        pattern = r"^~\u202f"
+        pattern = r"^~\u202f"  # Specifiek patroon voor ongewenste prefixen
         self.df[self.columns.author] = (
             self.df[self.columns.author]
             .astype(str)
@@ -51,7 +58,7 @@ class Preprocessor:
         logger.info("Authors opgeschoond.")
 
     def anonymize_authors(self):
-        """Anonimiseer auteursnamen met unieke namen en sla mapping op."""
+        """Anonimiseer auteursnamen en sla de originele namen als referentie op."""
         from wa_analyzer.humanhasher import humanize
 
         authors = self.df[self.columns.author].unique()
@@ -60,6 +67,7 @@ class Preprocessor:
         if len(anon_map) != len(authors):
             logger.warning("Aantal unieke auteurs na anonymisatie klopt niet.")
 
+        # Opslaan van mapping voor later herstel
         ref_file = self.processed_dir / self.config.anon_reference
         self.processed_dir.mkdir(parents=True, exist_ok=True)
         ref_sorted = {v: k for k, v in sorted((v, k) for k, v in anon_map.items())}
@@ -75,20 +83,20 @@ class Preprocessor:
     # ─────────────────────────────────────────────────────────────────────────────
 
     def add_message_length(self):
-        """Voeg kolom toe met lengte van elk bericht."""
+        """Bereken de lengte van elk bericht en voeg deze toe als nieuwe kolom."""
         self.df[self.columns.message_length] = (
             self.df[self.columns.message].astype(str).str.len()
         )
         logger.info("Kolom 'message_length' toegevoegd.")
 
     def add_author_info(self):
-        """Voeg leeftijd, geslacht en andere info toe per auteur."""
+        """Verrijk de dataset met leeftijd, geslacht en andere info over auteurs."""
         info = load_author_info(self.config)
         self.df = self.df.merge(info, on=self.columns.author, how="left")
         logger.info("Auteur-info toegevoegd.")
 
     def set_has_emoji(self):
-        """Voeg kolom toe met aantal emoji’s per bericht."""
+        """Tel het aantal emoji's per bericht en voeg toe als kolom."""
 
         def count_emojis(msg):
             return len([c for c in str(msg) if c in emoji.EMOJI_DATA])
@@ -99,7 +107,7 @@ class Preprocessor:
         logger.info("Kolom 'emoji_count' toegevoegd.")
 
     def set_is_carnaval(self):
-        """Markeer of het bericht in een carnavalsweek is verzonden."""
+        """Markeer berichten die binnen een carnavalsperiode vallen."""
         self.df[self.columns.timestamp] = pd.to_datetime(
             self.df[self.columns.timestamp]
         )
@@ -118,8 +126,8 @@ class Preprocessor:
     # ─────────────────────────────────────────────────────────────────────────────
 
     def filter_automatic_messages(self):
-        """Verwijder standaard systeemberichten zoals 'media weggelaten'."""
-        pattern = "|".join(self.auto_msgs)
+        """Verwijder standaard automatische berichten zoals 'media weggelaten'."""
+        pattern = "|".join(self.auto_msgs)  # Combineer alle keywords in regex
         before = len(self.df)
         self.df = self.df[
             ~self.df[self.columns.message]
@@ -129,7 +137,7 @@ class Preprocessor:
         logger.info(f"{before - len(self.df)} automatische berichten verwijderd.")
 
     def filter_messages_after_start_date(self):
-        """Verwijder berichten die vóór de startdatum liggen."""
+        """Verwijder berichten die vóór de ingestelde startdatum zijn verzonden."""
         self.df[self.columns.timestamp] = pd.to_datetime(
             self.df[self.columns.timestamp], errors="coerce"
         )
@@ -142,7 +150,7 @@ class Preprocessor:
     # ─────────────────────────────────────────────────────────────────────────────
 
     def save_output(self):
-        """Sla de verwerkte data op als CSV en Parquet."""
+        """Sla de verwerkte dataset op in CSV- en Parquet-formaat."""
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         output_csv = self.processed_dir / f"whatsapp-{timestamp}-processed.csv"
         output_parquet = output_csv.with_suffix(".parquet")
@@ -161,8 +169,9 @@ class Preprocessor:
 
     def run(self):
         """
-        Voer alle stappen uit zoals gedefinieerd in settings.enabled_steps.
-        Automatisch ontdekt via methodenaam.
+        Doorloop alle preprocessing stappen zoals gedefinieerd in settings.enabled_steps.
+
+        Elk stap wordt dynamisch aangeroepen op basis van de methode-naam.
         """
         if self.df is None or self.df.empty:
             logger.error("Dataframe is leeg of niet geladen.")
