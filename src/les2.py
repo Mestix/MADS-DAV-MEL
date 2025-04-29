@@ -1,10 +1,15 @@
 from pathlib import Path
+
 import pandas as pd
 from loguru import logger
+
 from plot_settings import set_plot_style
 from plot_utils import plot_horizontal_bar
 
-def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_settings: dict):
+
+def generate_question_bar_chart(
+    df: pd.DataFrame, img_folder: Path, les2_settings: dict
+):
     """
     Genereer een bar chart van aantal vragen per gebruiker, volledig gestuurd door settings.
     """
@@ -38,9 +43,11 @@ def generate_question_bar_chart(df: pd.DataFrame, img_folder: Path, les2_setting
     inlaw = les2_settings["highlight_users"]["inlaw"]
 
     colors = [
-        colors_config["me"] if author == me else
-        colors_config["inlaw"] if author == inlaw else
-        colors_config["other"]
+        (
+            colors_config["me"]
+            if author == me
+            else colors_config["inlaw"] if author == inlaw else colors_config["other"]
+        )
         for author in vraag_count[col_author]
     ]
 

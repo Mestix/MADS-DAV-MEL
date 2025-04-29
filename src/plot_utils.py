@@ -1,5 +1,6 @@
-from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib import pyplot as plt
+
 
 def plot_horizontal_bar(
     data,

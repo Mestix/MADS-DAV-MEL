@@ -1,8 +1,10 @@
-from pathlib import Path
 import tomllib
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pydantic import BaseModel
+
 
 class PlotSettings(BaseModel):
     style: str
@@ -20,6 +22,7 @@ class PlotSettings(BaseModel):
             data = tomllib.load(f)
         return cls(**data["plot"])  # Zorg dat je in settings.toml een [plot] blok hebt!
 
+
 def set_plot_style(settings: PlotSettings = None):
     """
     Zet de standaardstijl voor alle plots.
@@ -33,13 +36,15 @@ def set_plot_style(settings: PlotSettings = None):
         palette=settings.palette,
     )
 
-    plt.rcParams.update({
-        "figure.figsize": settings.figsize,
-        "axes.titlesize": settings.title_size,
-        "axes.labelsize": settings.label_size,
-        "xtick.labelsize": settings.tick_size,
-        "ytick.labelsize": settings.tick_size,
-        "legend.fontsize": settings.legend_size,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-    })
+    plt.rcParams.update(
+        {
+            "figure.figsize": settings.figsize,
+            "axes.titlesize": settings.title_size,
+            "axes.labelsize": settings.label_size,
+            "xtick.labelsize": settings.tick_size,
+            "ytick.labelsize": settings.tick_size,
+            "legend.fontsize": settings.legend_size,
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+        }
+    )
