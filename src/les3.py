@@ -1,22 +1,24 @@
 from pathlib import Path
-
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+
 from loguru import logger
+from plot_settings import set_plot_style
+from plot_utils import plot_line_chart
+from plot_utils import plot_line_with_vertical_marker
 
-
-def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path):
+def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path, chart_settings: dict):
     """
     Genereert een lijnplot van het aantal berichten per week.
-    Carnavalperiodes worden automatisch gemarkeerd op basis van 'is_carnaval'.
+    Carnavalperiodes worden gemarkeerd.
     """
+    set_plot_style()
+
     df["week"] = df["timestamp"].dt.to_period("W").apply(lambda r: r.start_time.date())
 
     # Tel berichten per week
     weekly_counts = df.groupby("week").size().reset_index(name="message_count")
 
-    # Carnavalweken uit 'is_carnaval'-kolom
+    # Carnavalweken uit 'is_carnaval'
     carnaval_weken = (
         df[df["is_carnaval"]]
         .drop_duplicates("week")
@@ -26,44 +28,33 @@ def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path):
 
     carnaval_perioden = group_consecutive(carnaval_weken)
 
+    if weekly_counts.empty:
+        logger.warning("Geen wekelijkse data gevonden.")
+        return
+
     # Plot
-    plt.figure(figsize=(14, 6))
-    plt.plot(
-        weekly_counts["week"],
-        weekly_counts["message_count"],
-        color="tab:blue",
-        label="Aantal berichten per week",
+    plot_line_chart(
+        x=weekly_counts["week"],
+        y=weekly_counts["message_count"],
+        highlight_ranges=carnaval_perioden,
+        xlabel=chart_settings["xlabel"],
+        ylabel=chart_settings["ylabel"],
+        title=chart_settings["title"],
+        output_path=output_path,
+        highlight_label="Carnaval",
+        highlight_color="orange",
     )
 
-    # Carnaval visueel markeren
-    for i, (start, end) in enumerate(carnaval_perioden):
-        plt.axvspan(start, end, color="orange", alpha=0.3, label=f"Carnaval {i + 1}")
-
-    # Legenda opschonen
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys())
-
-    plt.xlabel("Week")
-    plt.ylabel("Aantal berichten")
-    plt.title("Activiteit in de familiechat per week rondom carnaval 2024 & 2025")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    plt.savefig(output_path, bbox_inches="tight")
-    plt.close()
-    logger.info(f"Afbeelding opgeslagen als: {output_path}")
-
-
-def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path):
+def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path, chart_settings: dict):
     """
-    Zoomt in op de 2 weken vóór en 5 dagen tijdens carnaval,
-    toont activiteit per dag (aantal berichten) per jaar.
+    Zoomt in op berichten rond carnaval ([-14, +5 dagen]).
     """
+    set_plot_style()
+
     df["date"] = df["timestamp"].dt.floor("D")
     df["year"] = df["timestamp"].dt.year
 
-    # Vind de eerste dag van carnaval per jaar op basis van is_carnaval == True
+    # Eerste carnavaldag per jaar
     carnaval_start = (
         df[df["is_carnaval"]]
         .groupby("year")["date"]
@@ -73,68 +64,55 @@ def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path):
     )
 
     if carnaval_start.empty:
-        logger.warning("Geen carnavalstartdatums gevonden.")
+        logger.warning("Geen carnavalstart gevonden.")
         return
 
-    # Combineer met volledige df (dus niet alleen is_carnaval)
     df = df.merge(carnaval_start, on="year", how="left")
     df["days_until_carnaval"] = (df["date"] - df["start_date"]).dt.days
 
-    # Filter alleen berichten in [-14, +5] rond carnaval
-    df_window = df[df["days_until_carnaval"].between(-14, 5)].copy()
+    df_window = df[df["days_until_carnaval"].between(-14, 5)]
 
     if df_window.empty:
-        logger.warning("Geen berichten gevonden binnen het carnavalsvenster.")
+        logger.warning("Geen data binnen carnavalsvenster.")
         return
 
-    # Aantal berichten per dag t.o.v. carnaval, per jaar
     agg = (
         df_window.groupby(["year", "days_until_carnaval"])
         .size()
         .reset_index(name="message_count")
     )
 
-    # Plot
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(
+    # plot
+    plot_line_with_vertical_marker(
         data=agg,
         x="days_until_carnaval",
         y="message_count",
         hue="year",
-        marker="o",
+        xlabel=chart_settings["xlabel"],
+        ylabel=chart_settings["ylabel"],
+        title=chart_settings["title"],
+        output_path=output_path,
+        marker_position=0,
+        marker_label="Start carnaval",
     )
-    plt.axvline(0, color="gray", linestyle="--", label="Start carnaval")
-    plt.title("Activiteit in de 2 weken vóór carnaval")
-    plt.xlabel("Dagen tot carnaval")
-    plt.ylabel("Aantal berichten")
-    plt.legend(title="Jaar")
-    plt.tight_layout()
-
-    plt.savefig(output_path, bbox_inches="tight")
-    plt.close()
-    logger.info(f"Afbeelding opgeslagen als: {output_path}")
-
 
 def generate_time_charts(df: pd.DataFrame, output_dir: Path, les3_settings: dict):
     """
-    Wrapperfunctie die beide les 3 visualisaties uitvoert.
-    Bestandsnamen komen uit settings.
+    Wrapper die beide les3 charts maakt.
     """
     if df.empty:
-        logger.warning("Dataframe is leeg. Geen visualisaties gegenereerd.")
+        logger.warning("Dataframe is leeg. Geen grafieken gegenereerd.")
         return
 
     output_week = output_dir / les3_settings["output_files"]["weekly"]
     output_detail = output_dir / les3_settings["output_files"]["detail"]
 
-    generate_weekly_overview_chart(df, output_week)
-    generate_carnaval_detail_chart(df, output_detail)
-
+    generate_weekly_overview_chart(df, output_week, les3_settings["weekly_chart"])
+    generate_carnaval_detail_chart(df, output_detail, les3_settings["detail_chart"])
 
 def group_consecutive(dates):
     """
-    Groepeert opeenvolgende weken tot (start, end) tuples.
-    Werkt met gesorteerde week-startdatums als '2024-02-05', '2024-02-12', ...
+    Groepeert aaneengesloten datums tot (start, end) tuples.
     """
     if not dates:
         return []
@@ -143,12 +121,10 @@ def group_consecutive(dates):
     start = prev = dates[0]
 
     for current in dates[1:]:
-        # Als verschil > 7 dagen, dan begint er een nieuwe reeks
         if (current - prev).days > 7:
             ranges.append((start, prev))
             start = current
         prev = current
 
-    # Voeg laatste groep toe
     ranges.append((start, prev))
     return ranges

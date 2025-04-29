@@ -58,6 +58,16 @@ legend_labels = { me = "Ik", inlaw = "Mijn Schoonmoeder", other = "Overige groep
 weekly = "les3_weekactiviteit.png"
 detail = "les3_2weken_detail.png"
 
+[les3.weekly_chart]
+xlabel = "Week"
+ylabel = "Aantal berichten"
+title = "Activiteit per week rondom carnaval"
+
+[les3.detail_chart]
+xlabel = "Dagen tot carnaval"
+ylabel = "Aantal berichten"
+title = "Activiteit rond start carnaval"
+
 [les5.columns]
 author = "author"
 emoji_count = "emoji_count"
