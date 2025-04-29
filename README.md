@@ -1,18 +1,102 @@
-# MADS-DAV-MEL
-Module: Master ADS data visualisations
+# WhatsApp Analyseproject
 
-Naam: Melissa Landwerd
+Dit project analyseert WhatsApp-groepsgesprekken en genereert visualisaties over gebruikersgedrag, berichtenactiviteit, schrijfstijl en meer.
 
-studentnumber: 1878919
+## Functionaliteit
 
-Activate environment
-source .venv/bin/activate
+- Preprocessing: Verrijkt ruwe WhatsApp-data met metadata zoals lengte, emoji's, carnavalindicatoren, enz.
+- Visualisaties per les:
+  - Les 2 – Wie stelt de meeste vragen?
+  - Les 3 – Activiteit door de tijd (wekelijks & rondom carnaval)
+  - Les 4 – (Nog in ontwikkeling)
+  - Les 5 – Correlaties en groepsverschillen (aangetrouwd vs. anderen)
+  - Les 6 – Schrijfstijlvisualisatie met PCA/t-SNE
 
-Run Analyzer
-analyzer --device ios
+## Installatie
 
-Run visualisation
-python src/main.py <function>
+1. Clone deze repo:
+   ```bash
+   git clone https://github.com/Mestix/MADS-DAV-MEL.git
+   cd MADS-DAV-MEL
+   ```
 
-Run lefthook pre commit on staged files
-lefthook run pre-commit
+2. Maak een virtuele omgeving aan:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # Linux/macOS
+   .venv\Scripts\activate   # Windows
+   ```
+
+3. Installeer dependencies:
+   ```bash
+   uv sync --all extras
+   ```
+
+Alternatief zonder uv:
+```bash
+pip install -r requirements.txt
+```
+
+## Preprocessing
+
+1. Zet de ruwe WhatsApp-chat als _chat.txt in data/raw/.
+
+2. Run wa-analyzer voor je toestel:
+   ```bash
+   analyzer --device ios   # of android
+   ```
+
+3. Zet het pad naar de geëxporteerde CSV in config.toml.
+
+4. Run de preprocessor om het .parquet bestand te genereren:
+   ```bash
+   python src/main.py --preprocess
+   ```
+
+5. Zorg dat author_info.txt beschikbaar is in data/processed/, bijvoorbeeld:
+   ```
+   "author","age","gender","is_inlaw"
+   "amusing-owl",36,"m",1
+   ```
+
+## Visualisaties genereren
+
+- Eén specifieke les:
+  ```bash
+  python src/main.py --les 2
+  ```
+
+- Alle lessen:
+  ```bash
+  python src/main.py --all
+  ```
+
+Output wordt opgeslagen in de img/-map.
+
+## Configuratie
+
+- config.toml: Pad- en bestandsinstellingen
+- settings.toml: Preprocessing- en plotinstellingen (zoals kleuren, labels, filters)
+
+## Projectstructuur
+
+```
+.
+├── src/                # Broncode per les
+├── data/               # WhatsApp-data (ruw/verwerkt)
+├── img/                # Afbeeldingen gegenereerd uit visualisaties
+├── notebooks/          # Analyse notebooks (optioneel)
+├── logs/               # Logbestanden
+├── settings.toml       # Visualisatieconfiguratie
+├── config.toml         # Pad- en inputconfiguratie
+├── requirements.txt    # Pip dependencies
+└── README.md
+```
+
+## Belangrijke dependencies
+
+- pandas, numpy, scikit-learn, seaborn, matplotlib
+- nltk, pyarrow, loguru
+- wa-analyzer voor WhatsApp-parsering
+
+© 2025 – WhatsApp Analyseproject – door Melistixx
