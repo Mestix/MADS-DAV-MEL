@@ -6,6 +6,7 @@ from loguru import logger
 from plot_settings import set_plot_style
 from plot_utils import plot_boxplot, plot_heatmap
 
+
 # Functie om een boxplot te genereren van de relatie tussen carnaval en schoonfamilie
 def generate_relations_chart(df: pd.DataFrame, output_path: Path, settings: dict):
     set_plot_style()  # Stel standaard plotstijl in
