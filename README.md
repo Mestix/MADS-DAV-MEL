@@ -46,17 +46,17 @@ pip install -r requirements.txt
    analyzer --device ios   # of android
    ```
 
-3. Zet het pad naar de geëxporteerde CSV in config.toml.
+3. Zet het pad naar de geëxporteerde CSV uit data/processed in config.toml.
 
-4. Run de preprocessor om het .parquet bestand te genereren:
-   ```bash
-   python src/main.py --preprocess
-   ```
-
-5. Zorg dat author_info.txt beschikbaar is in data/processed/, bijvoorbeeld:
+4. Zorg dat author_info.txt beschikbaar is in data/processed/, kloppend bij de geanonimiseerde users uit anon_reference.json:
    ```
    "author","age","gender","is_inlaw"
    "amusing-owl",36,"m",1
+   ```
+
+5. Run de preprocessor om het .parquet bestand te genereren en extra data toe te voegen:
+   ```bash
+   python src/main.py --preprocess
    ```
 
 ## Visualisaties genereren

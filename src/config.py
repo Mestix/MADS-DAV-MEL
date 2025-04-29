@@ -1,7 +1,6 @@
 import tomllib
 from pathlib import Path
 
-import pandas as pd
 from pydantic import BaseModel
 
 

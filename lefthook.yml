@@ -9,5 +9,7 @@ pre-commit:
         fi
     black:
       run: black .
-    isort:
-      run: isort .
+    ruff:
+      run: ruff .
+    mypy:
+      run: mypy src/
