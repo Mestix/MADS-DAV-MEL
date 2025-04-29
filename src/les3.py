@@ -1,12 +1,15 @@
 from pathlib import Path
+
 import pandas as pd
-
 from loguru import logger
-from plot_settings import set_plot_style
-from plot_utils import plot_line_chart
-from plot_utils import plot_line_with_vertical_marker
 
-def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path, chart_settings: dict):
+from plot_settings import set_plot_style
+from plot_utils import plot_line_chart, plot_line_with_vertical_marker
+
+
+def generate_weekly_overview_chart(
+    df: pd.DataFrame, output_path: Path, chart_settings: dict
+):
     """
     Genereert een lijnplot van het aantal berichten per week.
     Carnavalperiodes worden gemarkeerd.
@@ -45,7 +48,10 @@ def generate_weekly_overview_chart(df: pd.DataFrame, output_path: Path, chart_se
         highlight_color="orange",
     )
 
-def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path, chart_settings: dict):
+
+def generate_carnaval_detail_chart(
+    df: pd.DataFrame, output_path: Path, chart_settings: dict
+):
     """
     Zoomt in op berichten rond carnaval ([-14, +5 dagen]).
     """
@@ -96,6 +102,7 @@ def generate_carnaval_detail_chart(df: pd.DataFrame, output_path: Path, chart_se
         marker_label="Start carnaval",
     )
 
+
 def generate_time_charts(df: pd.DataFrame, output_dir: Path, les3_settings: dict):
     """
     Wrapper die beide les3 charts maakt.
@@ -109,6 +116,7 @@ def generate_time_charts(df: pd.DataFrame, output_dir: Path, les3_settings: dict
 
     generate_weekly_overview_chart(df, output_week, les3_settings["weekly_chart"])
     generate_carnaval_detail_chart(df, output_detail, les3_settings["detail_chart"])
+
 
 def group_consecutive(dates):
     """

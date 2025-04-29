@@ -1,6 +1,7 @@
-from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
+from matplotlib import pyplot as plt
+
 
 def plot_horizontal_bar(
     data,
@@ -13,7 +14,7 @@ def plot_horizontal_bar(
     annotation=None,
     legend_labels=None,
     output_path=None,
-    legend_colors=None, 
+    legend_colors=None,
 ):
     """
     Plot een horizontale staafdiagram met optionele annotatie en legenda.
@@ -68,7 +69,18 @@ def plot_horizontal_bar(
     else:
         plt.show()
 
-def plot_line_chart(x, y, highlight_ranges=None, xlabel="", ylabel="", title="", output_path=None, highlight_color="orange", highlight_label="Highlight"):
+
+def plot_line_chart(
+    x,
+    y,
+    highlight_ranges=None,
+    xlabel="",
+    ylabel="",
+    title="",
+    output_path=None,
+    highlight_color="orange",
+    highlight_label="Highlight",
+):
     """
     Eenvoudige lijnplot met optionele highlight-blokken (bijv. carnavalperiodes).
     """
@@ -77,7 +89,9 @@ def plot_line_chart(x, y, highlight_ranges=None, xlabel="", ylabel="", title="",
 
     if highlight_ranges:
         for start, end in highlight_ranges:
-            plt.axvspan(start, end, color=highlight_color, alpha=0.3, label=highlight_label)
+            plt.axvspan(
+                start, end, color=highlight_color, alpha=0.3, label=highlight_label
+            )
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -97,7 +111,18 @@ def plot_line_chart(x, y, highlight_ranges=None, xlabel="", ylabel="", title="",
         plt.show()
 
 
-def plot_line_with_vertical_marker(data, x, y, hue=None, xlabel="", ylabel="", title="", output_path=None, marker_position=0, marker_label="Marker"):
+def plot_line_with_vertical_marker(
+    data,
+    x,
+    y,
+    hue=None,
+    xlabel="",
+    ylabel="",
+    title="",
+    output_path=None,
+    marker_position=0,
+    marker_label="Marker",
+):
     """
     Lijnplot uit DataFrame, met verticale markerlijn (bijv. start carnaval).
     """
