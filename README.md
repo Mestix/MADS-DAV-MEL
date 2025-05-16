@@ -94,4 +94,4 @@ Output wordt opgeslagen in de img/-map.
 - nltk, pyarrow, loguru
 - wa-analyzer voor WhatsApp-parsering
 
-© 2025 – WhatsApp Analyseproject – door Melistixx
+© 2025 – WhatsApp Analyseproject – door Melistixx 1878919
