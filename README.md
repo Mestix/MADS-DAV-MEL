@@ -2,6 +2,8 @@
 
 Dit project analyseert WhatsApp-groepsgesprekken en genereert visualisaties over gebruikersgedrag, berichtenactiviteit, schrijfstijl en meer.
 
+Door: Melissa Landwerd, 1878919
+
 ## Functionaliteit
 
 - Preprocessing: Verrijkt ruwe WhatsApp-data met metadata zoals lengte, emoji's, carnavalindicatoren, enz.
