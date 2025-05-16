@@ -1,5 +1,8 @@
 import argparse
 from pathlib import Path
+import sys
+sys.path.append(str(Path("./modules").resolve()))
+sys.path.append(str(Path("./src/lessons").resolve()))
 
 from loguru import logger
 
@@ -12,7 +15,6 @@ from les5 import generate_relation_charts
 from les6 import generate_les6_charts
 from preprocessor import Preprocessor
 from settings import Settings
-
 
 def run_chart_for_lesson(lesson_number: int, df, img_folder: Path, settings):
     "Voert de juiste chart-functie uit op basis van lesnummer."
