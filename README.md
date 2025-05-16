@@ -80,6 +80,7 @@ Output wordt opgeslagen in de img/-map.
 ├── src/                # Broncode per les
 ├── data/               # WhatsApp-data (raw/processed)
 ├── img/                # Afbeeldingen gegenereerd uit visualisaties
+├── modules/            # Herbruikbare modules
 ├── notebooks/          # Analyse notebooks
 ├── logs/               # Logbestanden
 ├── settings.toml       # Visualisatieconfiguratie
