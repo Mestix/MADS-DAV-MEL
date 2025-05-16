@@ -8,7 +8,7 @@ Dit project analyseert WhatsApp-groepsgesprekken en genereert visualisaties over
 - Visualisaties per les:
   - Les 2 – Wie stelt de meeste vragen?
   - Les 3 – Activiteit door de tijd (wekelijks & rondom carnaval)
-  - Les 4 – (Nog in ontwikkeling)
+  - Les 4 – Kansverdeling op berichten per dag per week
   - Les 5 – Correlaties en groepsverschillen (aangetrouwd vs. anderen)
   - Les 6 – Schrijfstijlvisualisatie met PCA/t-SNE
 
