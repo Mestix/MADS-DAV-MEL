@@ -125,7 +125,7 @@ other_color = "lightgrey"
 
 [plot]
 figsize = [8, 5]
-style = "whitegrid"
+style = "white"
 palette = "pastel"
 grid = true
 context = "notebook"

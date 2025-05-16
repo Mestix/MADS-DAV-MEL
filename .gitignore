@@ -15,4 +15,3 @@ data/processed/*.json
 .DS_Store
 *.egg-infos
 .notebookcache
-config.toml
